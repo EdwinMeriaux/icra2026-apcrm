@@ -1,0 +1,8 @@
+day,date,time,session_id,event_type,title,speakers,location,notes
+Thursday,2026-06-04,09:00-10:30,ThI1P,Panel,"Panels 5 — ""Robots for All"" in a Fragmented World: Competing Global Visions and Shared Futures from Europe, Asia, and the United States",TBD,Hall A1 (Plenary),Panel on global robotics policy & vision
+Thursday,2026-06-04,09:00-10:30,ThI1K,Industry Keynotes,Industry Keynotes 2,TBD,Strauss 1-2,Industry keynote slot 2
+Thursday,2026-06-04,11:00-12:30,ThAT5,Keynotes,"Keynotes 5 — David Hsu, Stefanie Tellex, Noémie Jaquier, Paolo Robuffo Giordano","David Hsu; Stefanie Tellex; Noémie Jaquier; Paolo Robuffo Giordano",Hall A1 (Plenary),"Direct APCRM lineup. Hsu: planning under uncertainty/POMDPs. Tellex: language-grounded planning. Jaquier: geometry-aware learning for control. Robuffo Giordano: multi-robot control & teleoperation."
+Thursday,2026-06-04,14:00-14:50,ThPL,Plenary,Plenary by Roland Siegwart,Roland Siegwart (ETH Zürich),Hall A1 (Plenary),Plenary by ETH leader in autonomous mobile robots & field robotics
+Thursday,2026-06-04,15:00-16:30,ThI2P,Panel,Panels 6 — Return on Humanoid Investment,TBD,Hall A1 (Plenary),Panel on humanoid robotics business case
+Thursday,2026-06-04,15:00-16:30,ThI2K,Keynote Tutorial,Keynote Tutorial 6,TBD,Strauss 1-2,Afternoon keynote tutorial slot
+Thursday,2026-06-04,16:45-18:15,ThBT5,Keynotes,"Keynotes 6 — Julia A. Adams, Marcia O'Malley, Tetsunari Inamura, Berk Calli","Julia A. Adams; Marcia O'Malley; Tetsunari Inamura; Berk Calli",Hall A1 (Plenary),"Adams: HRI/multi-agent. O'Malley: haptics & rehab. Inamura: HRI & simulation. Calli: grasping/manipulation."

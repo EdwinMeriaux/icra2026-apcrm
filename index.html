@@ -618,9 +618,12 @@
 // CONFIG — add one entry per day CSV file
 // ============================================================================
 const DAYS = [
-  { file: 'data/sunday.csv',  label: 'Sunday',  date: 'May 31' },
-  { file: 'data/monday.csv',  label: 'Monday',  date: '1 Jun'  },
-  { file: 'data/friday.csv',  label: 'Friday',  date: '5 Jun'  },
+  { file: 'data/sunday.csv',           label: 'Sunday',    date: 'May 31' },
+  { file: 'data/monday.csv',           label: 'Monday',    date: '1 Jun'  },
+  { file: 'data/tuesday-events.csv',   label: 'Tuesday',   date: '2 Jun'  },
+  { file: 'data/wednesday-events.csv', label: 'Wednesday', date: '3 Jun'  },
+  { file: 'data/thursday-events.csv',  label: 'Thursday',  date: '4 Jun'  },
+  { file: 'data/friday.csv',           label: 'Friday',    date: '5 Jun'  },
 ];
 
 // ============================================================================
@@ -658,23 +661,31 @@ function csvRow(line) {
 }
 
 function toSession(row) {
-  const isTBA = !row.start_time || row.start_time === '????';
-  const time = isTBA ? 'TBA' : `${row.start_time}–${row.end_time}`;
+  // Schema A: separate start_time / end_time columns (workshop CSVs)
+  // Schema B: combined time column e.g. "09:00-10:30" (event CSVs)
+  let time, start_time;
+  if (row.time) {
+    time = /^\?/.test(row.time) ? 'TBA' : row.time.replace(/\s*-\s*(?=\d)/, '–');
+    start_time = row.time.split('-')[0].trim();
+  } else {
+    const isTBA = !row.start_time || row.start_time === '????';
+    time = isTBA ? 'TBA' : `${row.start_time}–${row.end_time}`;
+    start_time = row.start_time || '';
+  }
   return {
     day:           row.day          || '',
     date:          row.date         || '',
     time,
-    start_time:    row.start_time   || '',
-    end_time:      row.end_time     || '',
-    session_code:  row.session_code || '',
-    session_type:  row.session_type || '',
-    workshop_name: row.workshop_short_name || row.session_type || '',
+    start_time,
+    session_code:  row.session_id   || row.session_code || '',
+    session_type:  row.event_type   || row.session_type || '',
+    workshop_name: row.workshop_short_name || '',
     location:      row.location     || '',
     title:         row.talk_title   || row.title || '',
     relevance:     row.priority     || 'noteworthy',
-    why:           row.tc_relevance_reason || '',
+    why:           row.tc_relevance_reason || row.notes || '',
     url:           row.url          || '',
-    speaker:       row.speaker      || '',
+    speaker:       row.speakers     || row.speaker || '',
     affiliation:   row.speaker_affiliation || row.affiliation || '',
   };
 }
@@ -865,7 +876,7 @@ function renderCard(s) {
 // Split "Name A, Name B" / "Aff A / Aff B" into [{name, affil}] pairs
 function extractSpeakerList(speakerStr, affilStr) {
   if (!speakerStr || /^(N\/A|Various|TBD|Organizers)$/i.test(speakerStr.trim())) return [];
-  const names = speakerStr.split(/,\s*/).map(n => n.replace(/\s*\([^)]*\)\s*$/, '').trim()).filter(n => n && /^[A-Z]/.test(n));
+  const names = speakerStr.split(/[,;]\s*/).map(n => n.replace(/\s*\([^)]*\)\s*$/, '').trim()).filter(n => n && /^[A-Z]/.test(n));
   const affils = affilStr ? affilStr.split(/\s*\/\s*/).map(a => a.trim()) : [];
   return names.map((name, i) => ({
     name,

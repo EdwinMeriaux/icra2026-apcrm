@@ -1,0 +1,9 @@
+day,date,time,session_id,event_type,title,speakers,location,notes
+Tuesday,2026-06-02,09:00-10:30,TuI1P,Panel,"Panels 1 — From Humanoid Robotics Research to Startup Creation: The Role of Public Funding",TBD,Hall A1 (Plenary),Panel on translating humanoid research into startups via public funding
+Tuesday,2026-06-02,09:00-10:30,TuI1K,Keynote Tutorial,Keynote Tutorial 1,TBD,Strauss 1-2,Morning keynote tutorial slot
+Tuesday,2026-06-02,11:00-12:30,TuAT5,Keynotes,"Keynotes 1 — Johannes Betz, Michael Milford, Aniket Bera, Hesheng Wang","Johannes Betz; Michael Milford; Aniket Bera; Hesheng Wang",Hall A1 (Plenary),"Betz: autonomous racing/AV motion planning. Milford: VPR & navigation. Bera: crowd/social navigation. Wang: visual servoing & manipulation."
+Tuesday,2026-06-02,14:00-14:50,TuPL,Plenary,Plenary by Ken Goldberg,Ken Goldberg (UC Berkeley),Hall A1 (Plenary),Plenary on robotics & AI from a leading figure in grasping/manipulation/cloud robotics
+Tuesday,2026-06-02,15:00-16:30,TuI2P,Panel,Panels 2 — Advancing Sustainability in Robotics: From Green Design to Real-World Impact,TBD,Hall A1 (Plenary),Panel on sustainability in robotics
+Tuesday,2026-06-02,15:00-16:30,TuI2K,Keynote Tutorial,Keynote Tutorial 2,TBD,Strauss 1-2,Afternoon keynote tutorial slot
+Tuesday,2026-06-02,16:45-18:15,TuBT5,Keynotes,"Keynotes 2 — Eric Diller, Fanny Ficuciello, Tiantian Xu, Haoyong Yu","Eric Diller; Fanny Ficuciello; Tiantian Xu; Haoyong Yu",Hall A1 (Plenary),"Diller: microrobotics. Ficuciello: surgical/medical robotics. Xu: micro/nano robots. Yu: rehab/wearable robotics."
+Tuesday,2026-06-02,18:15-20:00,TuTH,Town Hall,IEEE RAS Town Hall,IEEE RAS leadership,Hall A3,Community town hall — TC business and society-wide updates
