@@ -18,9 +18,9 @@
     --rule: #3a3530;
     --accent: #c8392c;
     --accent-soft: #6f2018;
-    --bullseye: #e8b842;
-    --core: #c8392c;
-    --adjacent: #6e685c;
+    --spotlight: #e8b842;
+    --important: #c8392c;
+    --noteworthy: #6e685c;
   }
 
   * { box-sizing: border-box; }
@@ -212,9 +212,9 @@
     color: var(--paper);
     border-color: var(--accent);
   }
-  .pill.bullseye.active { background: var(--bullseye); border-color: var(--bullseye); color: #2a2206; }
-  .pill.core.active { background: var(--core); border-color: var(--core); }
-  .pill.adjacent.active { background: var(--ink-faint); border-color: var(--ink-faint); color: var(--paper); }
+  .pill.spotlight.active { background: var(--spotlight); border-color: var(--spotlight); color: #2a2206; }
+  .pill.important.active { background: var(--important); border-color: var(--important); }
+  .pill.noteworthy.active { background: var(--ink-faint); border-color: var(--ink-faint); color: var(--paper); }
 
   .results-count {
     font-family: 'JetBrains Mono', monospace;
@@ -278,8 +278,8 @@
     background: var(--paper-elev);
     border-left-color: var(--ink-dim);
   }
-  .talk-card.bullseye { border-left-color: var(--bullseye); }
-  .talk-card.core { border-left-color: var(--core); }
+  .talk-card.spotlight { border-left-color: var(--spotlight); }
+  .talk-card.important { border-left-color: var(--important); }
   .talk-card .workshop-tag {
     font-family: 'JetBrains Mono', monospace;
     font-size: 10px;
@@ -294,10 +294,10 @@
     border-radius: 50%;
     margin-right: 6px;
     vertical-align: 1px;
-    background: var(--adjacent);
+    background: var(--noteworthy);
   }
-  .talk-card.bullseye .relevance-dot { background: var(--bullseye); }
-  .talk-card.core .relevance-dot { background: var(--core); }
+  .talk-card.spotlight .relevance-dot { background: var(--spotlight); }
+  .talk-card.important .relevance-dot { background: var(--important); }
   .talk-card .talk-title {
     font-family: 'Fraunces', Georgia, serif;
     font-size: 17px;
@@ -361,13 +361,13 @@
   .ws-card {
     background: var(--paper-raised);
     border: 1px solid var(--rule);
-    border-top: 3px solid var(--adjacent);
+    border-top: 3px solid var(--noteworthy);
     padding: 24px 28px;
     transition: border-color 0.15s ease;
   }
   .ws-card:hover { border-color: var(--ink-faint); }
-  .ws-card.bullseye { border-top-color: var(--bullseye); }
-  .ws-card.core { border-top-color: var(--core); }
+  .ws-card.spotlight { border-top-color: var(--spotlight); }
+  .ws-card.important { border-top-color: var(--important); }
 
   .ws-card .ws-meta {
     font-family: 'JetBrains Mono', monospace;
@@ -381,8 +381,8 @@
     align-items: center;
   }
   .ws-card .ws-meta .relevance-tag { font-weight: 500; }
-  .ws-card.bullseye .ws-meta .relevance-tag { color: var(--bullseye); }
-  .ws-card.core .ws-meta .relevance-tag { color: var(--core); }
+  .ws-card.spotlight .ws-meta .relevance-tag { color: var(--spotlight); }
+  .ws-card.important .ws-meta .relevance-tag { color: var(--important); }
 
   .ws-card h3 {
     font-family: 'Fraunces', Georgia, serif;
@@ -495,9 +495,9 @@
     width: 10px; height: 10px;
     border-radius: 50%;
   }
-  .legend-item .dot.bullseye { background: var(--bullseye); }
-  .legend-item .dot.core { background: var(--core); }
-  .legend-item .dot.adjacent { background: var(--ink-faint); }
+  .legend-item .dot.spotlight { background: var(--spotlight); }
+  .legend-item .dot.important { background: var(--important); }
+  .legend-item .dot.noteworthy { background: var(--ink-faint); }
   .legend-item b { color: var(--ink); font-weight: 500; }
 
   /* footer */
@@ -627,7 +627,7 @@ function toSession(row) {
     session_type: row.session_type || '',
     location:     row.location     || '',
     title:        row.title        || '',
-    relevance:    row.priority     || 'adjacent',
+    relevance:    row.priority     || 'noteworthy',
     why:          row.tc_relevance_reason || '',
     url:          row.url          || '',
     speaker:      row.speaker      || '',
@@ -663,9 +663,9 @@ function buildUI(days) {
     </div>
     <div class="pill-group" id="filter-${escapeAttr(d.key)}">
       <button class="pill active" data-rel="all">All</button>
-      <button class="pill bullseye" data-rel="bullseye">Bullseye</button>
-      <button class="pill core" data-rel="core">Core</button>
-      <button class="pill adjacent" data-rel="adjacent">Adjacent</button>
+      <button class="pill spotlight" data-rel="spotlight">Spotlight</button>
+      <button class="pill important" data-rel="important">Important</button>
+      <button class="pill noteworthy" data-rel="noteworthy">Noteworthy</button>
     </div>
     <div class="results-count" id="count-${escapeAttr(d.key)}"></div>
   </div>
@@ -685,9 +685,9 @@ function buildUI(days) {
     </div>
     <div class="pill-group" id="filter-workshops">
       <button class="pill active" data-rel="all">All</button>
-      <button class="pill bullseye" data-rel="bullseye">Bullseye</button>
-      <button class="pill core" data-rel="core">Core</button>
-      <button class="pill adjacent" data-rel="adjacent">Adjacent</button>
+      <button class="pill spotlight" data-rel="spotlight">Spotlight</button>
+      <button class="pill important" data-rel="important">Important</button>
+      <button class="pill noteworthy" data-rel="noteworthy">Noteworthy</button>
     </div>
     <div class="pill-group" id="day-workshops">
       <button class="pill active" data-day="all">All days</button>
@@ -717,9 +717,9 @@ function buildUI(days) {
     <p>Each day tab gives you a chronological timeline. Click any session card to expand and see the rationale for why it matters to the TC. The Workshops tab shows workshop-type sessions across all loaded days. The Speakers tab is an alphabetical index built from speaker data in the CSVs.</p>
 
     <div class="legend">
-      <div class="legend-item"><span class="dot bullseye"></span><span><b>Bullseye</b> — directly the TC's core scope. Don't miss.</span></div>
-      <div class="legend-item"><span class="dot core"></span><span><b>Core</b> — strongly TC-relevant.</span></div>
-      <div class="legend-item"><span class="dot adjacent"></span><span><b>Adjacent</b> — relevant for some TC subfields.</span></div>
+      <div class="legend-item"><span class="dot spotlight"></span><span><b>Spotlight</b> — top pick. Don't miss.</span></div>
+      <div class="legend-item"><span class="dot important"></span><span><b>Important</b> — strongly relevant.</span></div>
+      <div class="legend-item"><span class="dot noteworthy"></span><span><b>Noteworthy</b> — worth knowing about.</span></div>
     </div>
 
     <h3>The data.</h3>
@@ -739,7 +739,7 @@ function buildUI(days) {
 // ============================================================================
 // RENDERING
 // ============================================================================
-const RELEVANCE_ORDER = { bullseye: 0, core: 1, adjacent: 2, spotlight: 3 };
+const RELEVANCE_ORDER = { spotlight: 0, important: 1, noteworthy: 2 };
 
 function timeToMinutes(t) {
   const m = t.match(/(\d{1,2}):(\d{2})/);
@@ -843,7 +843,7 @@ function renderWorkshops(filterRel, filterDay, search) {
     return;
   }
 
-  const relLabel = { bullseye: '● BULLSEYE', core: '● CORE', adjacent: '● ADJACENT', spotlight: '● SPOTLIGHT' };
+  const relLabel = { spotlight: '● SPOTLIGHT', important: '● IMPORTANT', noteworthy: '● NOTEWORTHY' };
   let html = '';
   for (const w of sessions) {
     html += `<div class="ws-card ${escapeAttr(w.relevance)}">
