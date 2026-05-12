@@ -658,9 +658,8 @@ function csvRow(line) {
 }
 
 function toSession(row) {
-  const time = (row.start_time && row.end_time)
-    ? `${row.start_time}–${row.end_time}`
-    : (row.start_time || '');
+  const isTBA = !row.start_time || row.start_time === '????';
+  const time = isTBA ? 'TBA' : `${row.start_time}–${row.end_time}`;
   return {
     day:           row.day          || '',
     date:          row.date         || '',
