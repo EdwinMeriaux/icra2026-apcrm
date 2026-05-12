@@ -881,7 +881,7 @@ function renderWorkshops(filterRel, filterDay, search) {
   const workshopMap = new Map();
   for (const s of ALL_SESSIONS) {
     const key = s.workshop_name;
-    if (!key || !/workshop|tutorial/i.test(key)) continue;
+    if (!key || /reception|dinner|lunch|coffee break/i.test(key)) continue;
     if (!workshopMap.has(key)) workshopMap.set(key, []);
     workshopMap.get(key).push(s);
   }
