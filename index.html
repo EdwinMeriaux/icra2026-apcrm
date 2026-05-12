@@ -418,6 +418,8 @@
     line-height: 1.7;
     color: var(--ink-dim);
   }
+  .ws-speakers-list .ws-speaker-entry:nth-child(n+5) { display: none; }
+  .ws-card.speakers-expanded .ws-speakers-list .ws-speaker-entry { display: list-item; }
   .ws-spk-name { font-weight: 500; }
   .ws-speaker-entry.spotlight .ws-spk-name { color: var(--spotlight); }
   .ws-speaker-entry.important .ws-spk-name { color: var(--ink); }
@@ -426,6 +428,19 @@
     color: var(--ink-faint);
     font-size: 12px;
   }
+  .ws-speakers-toggle {
+    background: none;
+    border: none;
+    padding: 4px 0 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-faint);
+    cursor: pointer;
+    user-select: none;
+  }
+  .ws-speakers-toggle:hover { color: var(--ink-dim); }
 
   .ws-card .ws-link {
     margin-top: 20px;
@@ -931,6 +946,10 @@ function renderWorkshops(filterRel, filterDay, search) {
     const speakersHtml = w.speakers.map(s =>
       `<li class="ws-speaker-entry ${escapeAttr(s.relevance)}"><span class="ws-spk-name">${escapeHtml(s.name)}</span>${s.affil ? ` <span class="ws-spk-aff">· ${escapeHtml(s.affil)}</span>` : ''}</li>`
     ).join('');
+    const overflow = w.speakers.length > 4 ? w.speakers.length - 4 : 0;
+    const toggleHtml = overflow > 0
+      ? `<button class="ws-speakers-toggle" onclick="var c=this.closest('.ws-card');c.classList.toggle('speakers-expanded');this.textContent=c.classList.contains('speakers-expanded')?'— less':'+ ${overflow} more'">+ ${overflow} more</button>`
+      : '';
     html += `<div class="ws-card ${escapeAttr(w.relevance)}">
   <div class="ws-meta">
     <span>${escapeHtml(w.day)}</span>
@@ -938,7 +957,7 @@ function renderWorkshops(filterRel, filterDay, search) {
   </div>
   <h3>${escapeHtml(w.name)}</h3>
   ${w.why ? `<div class="about">${escapeHtml(w.why)}</div>` : ''}
-  ${speakersHtml ? `<div class="ws-speakers-label">Speakers</div><ul class="ws-speakers-list">${speakersHtml}</ul>` : ''}
+  ${speakersHtml ? `<div class="ws-speakers-label">Speakers</div><ul class="ws-speakers-list">${speakersHtml}</ul>${toggleHtml}` : ''}
   ${w.url ? `<a class="ws-link" href="${escapeAttr(w.url)}" target="_blank" rel="noopener">workshop site</a>` : ''}
 </div>`;
   }
