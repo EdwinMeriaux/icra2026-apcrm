@@ -399,6 +399,34 @@
     line-height: 1.55;
     margin-bottom: 16px;
   }
+  .ws-speakers-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-faint);
+    margin-top: 16px;
+    margin-bottom: 6px;
+  }
+  .ws-speakers-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .ws-speaker-entry {
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--ink-dim);
+  }
+  .ws-spk-name { font-weight: 500; }
+  .ws-speaker-entry.spotlight .ws-spk-name { color: var(--spotlight); }
+  .ws-speaker-entry.important .ws-spk-name { color: var(--ink); }
+  .ws-spk-aff {
+    font-style: italic;
+    color: var(--ink-faint);
+    font-size: 12px;
+  }
+
   .ws-card .ws-link {
     margin-top: 20px;
     display: inline-block;
@@ -576,7 +604,7 @@
 // ============================================================================
 const DAYS = [
   { file: 'data/sunday.csv',  label: 'Sunday',  date: 'May 31' },
-  // { file: 'data/monday.csv',  label: 'Monday',  date: '1 Jun'  },
+  { file: 'data/monday.csv',  label: 'Monday',  date: '1 Jun'  },
   // { file: 'data/friday.csv',  label: 'Friday',  date: '5 Jun'  },
 ];
 
@@ -619,19 +647,21 @@ function toSession(row) {
     ? `${row.start_time}–${row.end_time}`
     : (row.start_time || '');
   return {
-    day:          row.day          || '',
-    date:         row.date         || '',
+    day:           row.day          || '',
+    date:          row.date         || '',
     time,
-    start_time:   row.start_time   || '',
-    session_code: row.session_code || '',
-    session_type: row.session_type || '',
-    location:     row.location     || '',
-    title:        row.title        || '',
-    relevance:    row.priority     || 'noteworthy',
-    why:          row.tc_relevance_reason || '',
-    url:          row.url          || '',
-    speaker:      row.speaker      || '',
-    affiliation:  row.affiliation  || '',
+    start_time:    row.start_time   || '',
+    end_time:      row.end_time     || '',
+    session_code:  row.session_code || '',
+    session_type:  row.session_type || '',
+    workshop_name: row.workshop_short_name || row.session_type || '',
+    location:      row.location     || '',
+    title:         row.talk_title   || row.title || '',
+    relevance:     row.priority     || 'noteworthy',
+    why:           row.tc_relevance_reason || '',
+    url:           row.url          || '',
+    speaker:       row.speaker      || '',
+    affiliation:   row.speaker_affiliation || row.affiliation || '',
   };
 }
 
@@ -802,7 +832,9 @@ function renderTimeline(dayKey, filterRel, search) {
 }
 
 function renderCard(s) {
-  const tag = [s.session_code, s.session_type, s.location].filter(Boolean).join(' · ');
+  const workshopLabel = s.workshop_name || s.session_type;
+  const shortLabel = workshopLabel.length > 52 ? workshopLabel.slice(0, 49) + '…' : workshopLabel;
+  const tag = [s.session_code, shortLabel, (s.location && s.location !== 'TBA') ? s.location : ''].filter(Boolean).join(' · ');
   const speakerHtml = s.speaker
     ? `<div class="speaker"><span class="name">${escapeHtml(s.speaker)}</span>${s.affiliation ? ` <span class="aff">· ${escapeHtml(s.affiliation)}</span>` : ''}</div>`
     : '';
@@ -816,44 +848,98 @@ function renderCard(s) {
 </div>`;
 }
 
+// Split "Name A, Name B" / "Aff A / Aff B" into [{name, affil}] pairs
+function extractSpeakerList(speakerStr, affilStr) {
+  if (!speakerStr || /^(N\/A|Various|TBD|Organizers)$/i.test(speakerStr.trim())) return [];
+  const names = speakerStr.split(/,\s*/).map(n => n.replace(/\s*\([^)]*\)\s*$/, '').trim()).filter(n => n && /^[A-Z]/.test(n));
+  const affils = affilStr ? affilStr.split(/\s*\/\s*/).map(a => a.trim()) : [];
+  return names.map((name, i) => ({
+    name,
+    affil: affils[i] || (affils.length === 1 ? affils[0] : ''),
+  }));
+}
+
 function renderWorkshops(filterRel, filterDay, search) {
   const container = document.getElementById('grid-workshops');
   const countEl   = document.getElementById('count-workshops');
 
-  let sessions = ALL_SESSIONS.filter(s => /workshop|tutorial/i.test(s.session_type));
-  if (filterRel !== 'all') sessions = sessions.filter(s => s.relevance === filterRel);
-  if (filterDay !== 'all') sessions = sessions.filter(s => s.day === filterDay);
+  // Group sessions by workshop_name, skipping non-workshop rows
+  const workshopMap = new Map();
+  for (const s of ALL_SESSIONS) {
+    const key = s.workshop_name;
+    if (!key || !/workshop|tutorial/i.test(key)) continue;
+    if (!workshopMap.has(key)) workshopMap.set(key, []);
+    workshopMap.get(key).push(s);
+  }
+
+  // Build one workshop object per unique workshop
+  let workshops = [...workshopMap.entries()].map(([name, sessions]) => {
+    // Highest relevance across all talks in this workshop
+    const relevance = sessions.reduce((best, s) =>
+      (RELEVANCE_ORDER[s.relevance] ?? 99) < (RELEVANCE_ORDER[best] ?? 99) ? s.relevance : best
+    , 'noteworthy');
+
+    // Most-relevant talk's why text
+    const topSession = sessions.slice().sort((a, b) =>
+      (RELEVANCE_ORDER[a.relevance] ?? 99) - (RELEVANCE_ORDER[b.relevance] ?? 99)
+    )[0];
+
+    // Collect unique speakers, sorted by their talk's relevance (best first)
+    const seen = new Map();
+    for (const s of sessions.slice().sort((a, b) => (RELEVANCE_ORDER[a.relevance] ?? 99) - (RELEVANCE_ORDER[b.relevance] ?? 99))) {
+      for (const { name: spkName, affil } of extractSpeakerList(s.speaker, s.affiliation)) {
+        if (!seen.has(spkName)) seen.set(spkName, { affil, relevance: s.relevance });
+      }
+    }
+
+    return {
+      name,
+      day:       sessions[0].day,
+      relevance,
+      url:       sessions[0].url,
+      why:       topSession?.why || '',
+      speakers:  [...seen.entries()].map(([n, v]) => ({ name: n, affil: v.affil, relevance: v.relevance })),
+    };
+  });
+
+  // Filter
+  if (filterRel !== 'all') workshops = workshops.filter(w => w.relevance === filterRel);
+  if (filterDay !== 'all') workshops = workshops.filter(w => w.day === filterDay);
   if (search) {
     const q = search.toLowerCase();
-    sessions = sessions.filter(s =>
-      `${s.title} ${s.why} ${s.location} ${s.session_code}`.toLowerCase().includes(q)
+    workshops = workshops.filter(w =>
+      `${w.name} ${w.speakers.map(s => s.name).join(' ')} ${w.why}`.toLowerCase().includes(q)
     );
   }
 
-  sessions.sort((a, b) =>
+  workshops.sort((a, b) =>
     (RELEVANCE_ORDER[a.relevance] ?? 99) - (RELEVANCE_ORDER[b.relevance] ?? 99) ||
     a.day.localeCompare(b.day) ||
-    a.title.localeCompare(b.title)
+    a.name.localeCompare(b.name)
   );
 
-  countEl.textContent = `${sessions.length} workshop${sessions.length === 1 ? '' : 's'}`;
+  countEl.textContent = `${workshops.length} workshop${workshops.length === 1 ? '' : 's'}`;
 
-  if (sessions.length === 0) {
+  if (workshops.length === 0) {
     container.innerHTML = `<div class="empty">No workshop-type sessions in the loaded days yet.</div>`;
     return;
   }
 
   const relLabel = { spotlight: '● SPOTLIGHT', important: '● IMPORTANT', noteworthy: '● NOTEWORTHY' };
   let html = '';
-  for (const w of sessions) {
+  for (const w of workshops) {
+    const speakersHtml = w.speakers.map(s =>
+      `<li class="ws-speaker-entry ${escapeAttr(s.relevance)}"><span class="ws-spk-name">${escapeHtml(s.name)}</span>${s.affil ? ` <span class="ws-spk-aff">· ${escapeHtml(s.affil)}</span>` : ''}</li>`
+    ).join('');
     html += `<div class="ws-card ${escapeAttr(w.relevance)}">
   <div class="ws-meta">
-    <span>${escapeHtml(w.day)} · ${escapeHtml(w.time)} · ${escapeHtml(w.location)}</span>
-    <span class="relevance-tag">${relLabel[w.relevance] || '● ADJACENT'}</span>
+    <span>${escapeHtml(w.day)}</span>
+    <span class="relevance-tag">${relLabel[w.relevance] || '● NOTEWORTHY'}</span>
   </div>
-  <h3>${escapeHtml(w.title)}</h3>
+  <h3>${escapeHtml(w.name)}</h3>
   ${w.why ? `<div class="about">${escapeHtml(w.why)}</div>` : ''}
-  ${w.url ? `<a class="ws-link" href="${escapeAttr(w.url)}" target="_blank" rel="noopener">session page</a>` : ''}
+  ${speakersHtml ? `<div class="ws-speakers-label">Speakers</div><ul class="ws-speakers-list">${speakersHtml}</ul>` : ''}
+  ${w.url ? `<a class="ws-link" href="${escapeAttr(w.url)}" target="_blank" rel="noopener">workshop site</a>` : ''}
 </div>`;
   }
   container.innerHTML = html;
@@ -909,7 +995,7 @@ function renderSpeakers(search) {
     for (const [name, sessions] of entries) {
       html += `<div class="speaker-entry"><div class="name">${escapeHtml(name)}</div>`;
       for (const s of sessions) {
-        html += `<div class="where">${escapeHtml(s.session_code || s.session_type)}</div>`;
+        html += `<div class="where">${escapeHtml(s.workshop_name || s.session_code || s.session_type)}</div>`;
         html += `<div class="when">${escapeHtml(s.day)} · ${escapeHtml(s.time)}</div>`;
       }
       html += `</div>`;
