@@ -685,8 +685,9 @@ function toSession(row) {
     relevance:     row.priority     || 'noteworthy',
     why:           row.tc_relevance_reason || row.notes || '',
     url:           row.url          || '',
-    speaker:       row.speakers     || row.speaker || '',
-    affiliation:   row.speaker_affiliation || row.affiliation || '',
+    speaker:         row.speakers     || row.speaker || '',
+    affiliation:     row.speaker_affiliation || row.affiliation || '',
+    workshop_about:  row.workshop_tc_importance || '',
   };
 }
 
@@ -922,7 +923,7 @@ function renderWorkshops(filterRel, filterDay, search) {
       day:       sessions[0].day,
       relevance,
       url:       sessions[0].url,
-      why:       topSession?.why || '',
+      about:     sessions.find(s => s.workshop_about)?.workshop_about || topSession?.why || '',
       speakers:  [...seen.entries()].map(([n, v]) => ({ name: n, affil: v.affil, relevance: v.relevance })),
     };
   });
@@ -933,7 +934,7 @@ function renderWorkshops(filterRel, filterDay, search) {
   if (search) {
     const q = search.toLowerCase();
     workshops = workshops.filter(w =>
-      `${w.name} ${w.speakers.map(s => s.name).join(' ')} ${w.why}`.toLowerCase().includes(q)
+      `${w.name} ${w.speakers.map(s => s.name).join(' ')} ${w.about}`.toLowerCase().includes(q)
     );
   }
 
@@ -966,7 +967,7 @@ function renderWorkshops(filterRel, filterDay, search) {
     <span class="relevance-tag">${relLabel[w.relevance] || '● NOTEWORTHY'}</span>
   </div>
   <h3>${escapeHtml(w.name)}</h3>
-  ${w.why ? `<div class="about">${escapeHtml(w.why)}</div>` : ''}
+  ${w.about ? `<div class="about">${escapeHtml(w.about)}</div>` : ''}
   ${speakersHtml ? `<div class="ws-speakers-label">Speakers</div><ul class="ws-speakers-list">${speakersHtml}</ul>${toggleHtml}` : ''}
   ${w.url ? `<a class="ws-link" href="${escapeAttr(w.url)}" target="_blank" rel="noopener">workshop site</a>` : ''}
 </div>`;
