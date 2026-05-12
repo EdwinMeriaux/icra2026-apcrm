@@ -1,0 +1,3347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ICRA 2026 — TC Algorithms for Planning &amp; Control of Robot Motion · Workshop Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,800;1,9..144,400&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #f5f1e8;
+    --ink-dim: #b8b0a0;
+    --ink-faint: #6e685c;
+    --paper: #15130f;
+    --paper-raised: #1f1c17;
+    --paper-elev: #2a2620;
+    --rule: #3a3530;
+    --accent: #c8392c;        /* Vienna imperial red, slightly muted */
+    --accent-soft: #6f2018;
+    --bullseye: #e8b842;       /* gold for bullseye */
+    --core: #c8392c;           /* red for core */
+    --adjacent: #6e685c;       /* dim for adjacent */
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* ----- Header ----- */
+  header.masthead {
+    border-bottom: 1px solid var(--rule);
+    padding: 48px 32px 36px;
+    max-width: 1400px;
+    margin: 0 auto;
+    position: relative;
+  }
+  header.masthead::before {
+    content: "";
+    position: absolute;
+    left: 32px;
+    right: 32px;
+    top: 0;
+    height: 4px;
+    background: var(--accent);
+  }
+  .kicker {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+  .kicker .dot {
+    display: inline-block;
+    width: 5px; height: 5px;
+    background: var(--accent);
+    border-radius: 50%;
+    margin: 0 10px 2px 10px;
+    vertical-align: middle;
+  }
+  h1.title {
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 800;
+    font-size: clamp(36px, 5.5vw, 68px);
+    line-height: 1.02;
+    letter-spacing: -0.025em;
+    margin: 0 0 18px;
+    color: var(--ink);
+    max-width: 18ch;
+  }
+  h1.title em {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--accent);
+  }
+  .subtitle {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: clamp(16px, 2vw, 22px);
+    font-weight: 400;
+    font-style: italic;
+    color: var(--ink-dim);
+    max-width: 60ch;
+    margin: 0 0 28px;
+  }
+  .meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-faint);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  .meta b { color: var(--ink-dim); font-weight: 500; }
+
+  /* ----- Tabs / nav ----- */
+  nav.tabs {
+    position: sticky;
+    top: 0;
+    background: var(--paper);
+    border-bottom: 1px solid var(--rule);
+    z-index: 100;
+    padding: 0 32px;
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  nav.tabs::-webkit-scrollbar { display: none; }
+  nav.tabs button {
+    background: none;
+    border: none;
+    color: var(--ink-faint);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 18px 22px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+  nav.tabs button:hover { color: var(--ink); }
+  nav.tabs button.active {
+    color: var(--ink);
+    border-bottom-color: var(--accent);
+  }
+  nav.tabs button .count {
+    color: var(--ink-faint);
+    margin-left: 8px;
+    font-size: 10px;
+  }
+  nav.tabs button.active .count { color: var(--accent); }
+
+  main {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 32px;
+  }
+
+  /* ----- Filters ----- */
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+    margin-bottom: 28px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .search-wrap {
+    flex: 1;
+    min-width: 240px;
+    position: relative;
+  }
+  .search-wrap::before {
+    content: "/";
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--ink-faint);
+    font-size: 14px;
+  }
+  input[type=text] {
+    width: 100%;
+    background: var(--paper-raised);
+    border: 1px solid var(--rule);
+    color: var(--ink);
+    padding: 11px 14px 11px 30px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.15s ease;
+  }
+  input[type=text]:focus { border-color: var(--accent); }
+
+  .pill-group {
+    display: flex;
+    gap: 6px;
+  }
+  .pill {
+    background: var(--paper-raised);
+    border: 1px solid var(--rule);
+    color: var(--ink-dim);
+    padding: 8px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    user-select: none;
+  }
+  .pill:hover { color: var(--ink); border-color: var(--ink-faint); }
+  .pill.active {
+    background: var(--accent);
+    color: var(--paper);
+    border-color: var(--accent);
+  }
+  .pill.bullseye.active { background: var(--bullseye); border-color: var(--bullseye); color: #2a2206; }
+  .pill.core.active { background: var(--core); border-color: var(--core); }
+  .pill.adjacent.active { background: var(--ink-faint); border-color: var(--ink-faint); color: var(--paper); }
+  .pill.day-monday.active { background: #4a6fa5; border-color: #4a6fa5; }
+  .pill.day-friday.active { background: #6b8e4e; border-color: #6b8e4e; }
+
+  .results-count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  /* ----- Sections ----- */
+  .panel {
+    display: none;
+  }
+  .panel.active {
+    display: block;
+    animation: fadeIn 0.25s ease;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ----- Day timeline view ----- */
+  .day-block {
+    margin-bottom: 56px;
+  }
+  .day-block h2 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 800;
+    font-size: clamp(28px, 4vw, 48px);
+    letter-spacing: -0.02em;
+    margin: 0 0 6px;
+    color: var(--ink);
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 16px;
+  }
+  .day-block .day-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-top: -16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 0;
+  }
+
+  .timeslot {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 32px;
+    padding: 22px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .timeslot:last-child { border-bottom: none; }
+  .timeslot .time {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--ink);
+    font-weight: 500;
+    padding-top: 2px;
+  }
+  .timeslot .time .duration {
+    display: block;
+    color: var(--ink-faint);
+    font-size: 10px;
+    margin-top: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .timeslot .talks {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .talk-card {
+    background: var(--paper-raised);
+    border-left: 3px solid var(--rule);
+    padding: 16px 20px;
+    transition: all 0.15s ease;
+    cursor: pointer;
+    position: relative;
+  }
+  .talk-card:hover {
+    background: var(--paper-elev);
+    border-left-color: var(--ink-dim);
+  }
+  .talk-card.bullseye { border-left-color: var(--bullseye); }
+  .talk-card.core { border-left-color: var(--core); }
+  .talk-card .workshop-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-faint);
+    margin-bottom: 6px;
+  }
+  .talk-card .workshop-tag .relevance-dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    margin-right: 6px;
+    vertical-align: 1px;
+    background: var(--adjacent);
+  }
+  .talk-card.bullseye .relevance-dot { background: var(--bullseye); }
+  .talk-card.core .relevance-dot { background: var(--core); }
+  .talk-card .talk-title {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.3;
+    color: var(--ink);
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .talk-card .speaker {
+    font-size: 13px;
+    color: var(--ink-dim);
+  }
+  .talk-card .speaker .name {
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .talk-card .speaker .aff {
+    color: var(--ink-faint);
+    font-style: italic;
+  }
+  .talk-card .why {
+    margin-top: 10px;
+    font-size: 13px;
+    color: var(--ink-dim);
+    line-height: 1.5;
+    display: none;
+  }
+  .talk-card.expanded .why { display: block; }
+  .talk-card .more {
+    margin-top: 10px;
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+  }
+  .talk-card .more a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border 0.15s ease;
+  }
+  .talk-card .more a:hover { border-bottom-color: var(--accent); }
+  .talk-card .expand-toggle {
+    color: var(--ink-faint);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    user-select: none;
+  }
+  .talk-card .expand-toggle:hover { color: var(--ink-dim); }
+
+  /* ----- Workshop view ----- */
+  .ws-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+    gap: 20px;
+  }
+  .ws-card {
+    background: var(--paper-raised);
+    border: 1px solid var(--rule);
+    border-top: 3px solid var(--adjacent);
+    padding: 24px 28px;
+    transition: border-color 0.15s ease;
+  }
+  .ws-card:hover { border-color: var(--ink-faint); }
+  .ws-card.bullseye { border-top-color: var(--bullseye); }
+  .ws-card.core { border-top-color: var(--core); }
+
+  .ws-card .ws-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-faint);
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .ws-card .ws-meta .relevance-tag {
+    font-weight: 500;
+  }
+  .ws-card.bullseye .ws-meta .relevance-tag { color: var(--bullseye); }
+  .ws-card.core .ws-meta .relevance-tag { color: var(--core); }
+
+  .ws-card h3 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 22px;
+    line-height: 1.2;
+    margin: 0 0 14px;
+    color: var(--ink);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .ws-card .about {
+    font-size: 14px;
+    color: var(--ink-dim);
+    line-height: 1.55;
+    margin-bottom: 16px;
+  }
+  .ws-card .key-label, .ws-card .speakers-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-faint);
+    margin-top: 14px;
+    margin-bottom: 4px;
+  }
+  .ws-card .key-points {
+    font-size: 13px;
+    color: var(--ink-dim);
+    line-height: 1.5;
+  }
+  .ws-card .speakers {
+    font-size: 12px;
+    color: var(--ink-dim);
+    line-height: 1.6;
+    font-style: italic;
+  }
+  .ws-card .ws-link {
+    margin-top: 20px;
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px solid var(--accent-soft);
+    padding-bottom: 1px;
+  }
+  .ws-card .ws-link::before { content: "→ "; }
+  .ws-card .ws-link:hover { border-bottom-color: var(--accent); }
+
+  /* ----- Speaker index ----- */
+  .speaker-index {
+    columns: 2;
+    column-gap: 48px;
+    column-rule: 1px solid var(--rule);
+  }
+  .speaker-letter {
+    break-inside: avoid;
+    margin-bottom: 32px;
+  }
+  .speaker-letter h3 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 28px;
+    color: var(--accent);
+    margin: 0 0 12px;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 6px;
+  }
+  .speaker-entry {
+    margin-bottom: 14px;
+    break-inside: avoid;
+    font-size: 13px;
+  }
+  .speaker-entry .name {
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .speaker-entry .where {
+    color: var(--ink-dim);
+    margin-top: 2px;
+  }
+  .speaker-entry .when {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-faint);
+  }
+
+  /* ----- About panel ----- */
+  .about-panel {
+    max-width: 720px;
+  }
+  .about-panel h2 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 800;
+    font-size: 36px;
+    letter-spacing: -0.02em;
+    margin: 0 0 24px;
+  }
+  .about-panel p {
+    color: var(--ink-dim);
+    margin-bottom: 18px;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+  .about-panel h3 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 600;
+    font-size: 22px;
+    color: var(--ink);
+    margin-top: 36px;
+    margin-bottom: 12px;
+    letter-spacing: -0.01em;
+  }
+  .legend {
+    display: flex;
+    gap: 24px;
+    margin: 20px 0;
+    padding: 18px 24px;
+    background: var(--paper-raised);
+    border-left: 3px solid var(--accent);
+    flex-wrap: wrap;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--ink-dim);
+  }
+  .legend-item .dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+  }
+  .legend-item .dot.bullseye { background: var(--bullseye); }
+  .legend-item .dot.core { background: var(--core); }
+  .legend-item .dot.adjacent { background: var(--ink-faint); }
+  .legend-item b { color: var(--ink); font-weight: 500; }
+
+  /* footer */
+  footer {
+    border-top: 1px solid var(--rule);
+    padding: 32px;
+    margin-top: 64px;
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+    color: var(--ink-faint);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+
+  /* Empty state */
+  .empty {
+    padding: 80px 0;
+    text-align: center;
+    color: var(--ink-faint);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+  }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    header.masthead { padding: 32px 20px 28px; }
+    nav.tabs { padding: 0 20px; }
+    main { padding: 24px 20px; }
+    .timeslot { grid-template-columns: 1fr; gap: 8px; }
+    .timeslot .time { font-size: 14px; }
+    .speaker-index { columns: 1; }
+    .filters { flex-direction: column; align-items: stretch; }
+    .pill-group { flex-wrap: wrap; }
+  }
+
+  /* Print */
+  @media print {
+    body { background: white; color: black; }
+    nav.tabs, .filters, footer { display: none; }
+    .panel { display: block !important; page-break-after: always; }
+    .talk-card, .ws-card { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="kicker">ICRA 2026 <span class="dot"></span> Vienna, Austria <span class="dot"></span> 1–5 June</div>
+  <h1 class="title">A workshop guide for <em>algorithms of motion.</em></h1>
+  <p class="subtitle">Curated for members of the IEEE RAS Technical Committee on Algorithms for Planning and Control of Robot Motion. Twenty-three workshops and tutorials, parsed by hand, ranked by relevance to the TC.</p>
+  <div class="meta">
+    <span><b>Workshop days:</b> Monday 1 June &amp; Friday 5 June</span>
+    <span><b>Sessions cataloged:</b> 152</span>
+    <span><b>Workshops covered:</b> 23</span>
+  </div>
+</header>
+
+<nav class="tabs">
+  <button class="active" data-panel="monday">Monday <span class="count">1 Jun</span></button>
+  <button data-panel="friday">Friday <span class="count">5 Jun</span></button>
+  <button data-panel="workshops">Workshops <span class="count">overview</span></button>
+  <button data-panel="speakers">Speakers <span class="count">index</span></button>
+  <button data-panel="about">About</button>
+</nav>
+
+<main>
+  <!-- Monday -->
+  <section id="panel-monday" class="panel active">
+    <div class="filters">
+      <div class="search-wrap">
+        <input type="text" id="search-monday" placeholder="search talks, speakers, topics...">
+      </div>
+      <div class="pill-group" id="filter-monday">
+        <button class="pill active" data-rel="all">All</button>
+        <button class="pill bullseye" data-rel="bullseye">Bullseye</button>
+        <button class="pill core" data-rel="core">Core</button>
+        <button class="pill adjacent" data-rel="adjacent">Adjacent</button>
+      </div>
+      <div class="results-count" id="count-monday"></div>
+    </div>
+    <div id="timeline-monday"></div>
+  </section>
+
+  <!-- Friday -->
+  <section id="panel-friday" class="panel">
+    <div class="filters">
+      <div class="search-wrap">
+        <input type="text" id="search-friday" placeholder="search talks, speakers, topics...">
+      </div>
+      <div class="pill-group" id="filter-friday">
+        <button class="pill active" data-rel="all">All</button>
+        <button class="pill bullseye" data-rel="bullseye">Bullseye</button>
+        <button class="pill core" data-rel="core">Core</button>
+        <button class="pill adjacent" data-rel="adjacent">Adjacent</button>
+      </div>
+      <div class="results-count" id="count-friday"></div>
+    </div>
+    <div id="timeline-friday"></div>
+  </section>
+
+  <!-- Workshops -->
+  <section id="panel-workshops" class="panel">
+    <div class="filters">
+      <div class="search-wrap">
+        <input type="text" id="search-workshops" placeholder="search workshops...">
+      </div>
+      <div class="pill-group" id="filter-workshops">
+        <button class="pill active" data-rel="all">All</button>
+        <button class="pill bullseye" data-rel="bullseye">Bullseye</button>
+        <button class="pill core" data-rel="core">Core</button>
+        <button class="pill adjacent" data-rel="adjacent">Adjacent</button>
+      </div>
+      <div class="pill-group" id="day-workshops">
+        <button class="pill active" data-day="all">Both days</button>
+        <button class="pill day-monday" data-day="Monday">Monday</button>
+        <button class="pill day-friday" data-day="Friday">Friday</button>
+      </div>
+      <div class="results-count" id="count-workshops"></div>
+    </div>
+    <div id="grid-workshops" class="ws-grid"></div>
+  </section>
+
+  <!-- Speakers -->
+  <section id="panel-speakers" class="panel">
+    <div class="filters">
+      <div class="search-wrap">
+        <input type="text" id="search-speakers" placeholder="search by name...">
+      </div>
+      <div class="results-count" id="count-speakers"></div>
+    </div>
+    <div id="speaker-index" class="speaker-index"></div>
+  </section>
+
+  <!-- About -->
+  <section id="panel-about" class="panel">
+    <div class="about-panel">
+      <h2>About this guide.</h2>
+      <p>This is a curated catalog of every workshop and tutorial at <a href="https://2026.ieee-icra.org/workshops-and-tutorials/" style="color:var(--accent)">ICRA 2026</a> that's relevant to members of the IEEE RAS Technical Committee on Algorithms for Planning and Control of Robot Motion. Each session was sourced from the host workshop's own program page and ranked by relevance to the TC's scope.</p>
+
+      <h3>How to read it.</h3>
+      <p>The Monday and Friday tabs give you a chronological timeline. Click any talk card to expand and see the rationale for why it matters to the TC. The Workshops tab is the same content viewed from the other axis — by workshop rather than by time. The Speakers tab is an alphabetical index for hunting specific people.</p>
+
+      <div class="legend">
+        <div class="legend-item"><span class="dot bullseye"></span><span><b>Bullseye</b> — directly the TC's core scope. Don't miss.</span></div>
+        <div class="legend-item"><span class="dot core"></span><span><b>Core</b> — strongly TC-relevant.</span></div>
+        <div class="legend-item"><span class="dot adjacent"></span><span><b>Adjacent</b> — relevant for some TC subfields.</span></div>
+      </div>
+
+      <h3>Caveats.</h3>
+      <p>A few rows are marked <em>title TBD</em> where the speaker is confirmed but the abstract isn't yet published — typically these are inferred from the speaker's research area. Workshops where the schedule shows time blocks but doesn't map names to slots (LHMP, Multi-Agent, Space Robotics, Robots Meet Prior Maps) appear in the Workshops tab but not in the Monday/Friday timelines.</p>
+
+      <h3>The data.</h3>
+      <p>Everything in this guide is plain JSON inside this HTML file. To edit a row — fix a time, add a talk, change relevance — open this file in a text editor, find the <code style="color:var(--ink);background:var(--paper-raised);padding:2px 6px;font-family:'JetBrains Mono',monospace;font-size:12px">SESSIONS</code> or <code style="color:var(--ink);background:var(--paper-raised);padding:2px 6px;font-family:'JetBrains Mono',monospace;font-size:12px">WORKSHOPS</code> array near the top of the script block at the bottom, edit the value, save, refresh.</p>
+
+      <h3>Print.</h3>
+      <p>This page is set up to print all four content tabs as separate sections — useful if someone wants a paper handout. Use your browser's "Save as PDF" or "Print" function.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div>Built for the RAS TC on Algorithms for Planning &amp; Control of Robot Motion</div>
+  <div>Source: <a href="https://2026.ieee-icra.org/workshops-and-tutorials/">2026.ieee-icra.org</a></div>
+</footer>
+
+<script>
+// ============================================================================
+// DATA - edit these arrays to update the guide.
+// ============================================================================
+
+const SESSIONS = [
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "08:45-09:00",
+    "workshop": "Frontiers of Optimization for Robotics",
+    "title": "Welcome and introduction",
+    "speaker": "Organizers",
+    "affiliation": "UTIAS et al.",
+    "why": "Frames the day around three threads: numerical methods + differentiability, learning + optimization, global optimality + zero-order methods.",
+    "format": "Workshop opening",
+    "url": "https://sites.google.com/robotics.utias.utoronto.ca/icra26-frontiers-optimization/home",
+    "relevance": "bullseye"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "08:45-09:00",
+    "workshop": "RL in the Era of Imitation Learning (RL4IL)",
+    "title": "Opening remarks",
+    "speaker": "Organizers",
+    "affiliation": "Stanford / Columbia / UT Austin / Brown",
+    "why": "Sets up the central question: how RL complements IL for real-world robot policies.",
+    "format": "Workshop opening",
+    "url": "https://rl4il-icra.github.io/",
+    "relevance": "core"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "09:00-09:15",
+    "workshop": "CR2 Contact-Rich Control & Representation",
+    "title": "Welcome and intro",
+    "speaker": "Organizers",
+    "affiliation": "MIT / CMU / UPenn / Cornell / Duke",
+    "why": "Frames the day's debates around contact-rich control.",
+    "format": "Workshop opening",
+    "url": "https://cr2-icra.github.io",
+    "relevance": "bullseye"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "09:00-12:25",
+    "workshop": "Dexterous Manipulation",
+    "title": "Morning invited talks (per-slot speaker order TBA)",
+    "speaker": "Various: Pulkit Agrawal, Rika Antonova, Jeannette Bohg, Georgia Chalvatzaki, Matei Ciocarlie, Robert Katzschmann, Nathan Lepora, Jie Song, Maria Bauza",
+    "affiliation": "MIT / Cambridge / Stanford / TU Darmstadt / Columbia / ETH / Bristol / HKUST / Google DeepMind",
+    "why": "TC-relevant subsection: 'Synergy of Learning, Planning, and Control' — scaling planning/optimization to high-DoF systems; dynamic/forceful manipulation; safe compliance.",
+    "format": "Workshop talks",
+    "url": "https://dex-manipulation.github.io/icra2026/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "09:00-09:30",
+    "workshop": "Frontiers of Optimization for Robotics",
+    "title": "Numerical Optimal Control for Nonsmooth Systems",
+    "speaker": "Christian Dietz and Moritz Diehl",
+    "affiliation": "University of Freiburg",
+    "why": "Bullseye TC: numerical OC for nonsmooth (contact / hybrid) systems. Diehl is the acados author.",
+    "format": "Workshop invited talk",
+    "url": "https://sites.google.com/robotics.utias.utoronto.ca/icra26-frontiers-optimization/home",
+    "relevance": "bullseye"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "09:00-09:30",
+    "workshop": "RL in the Era of Imitation Learning (RL4IL)",
+    "title": "Invited talk",
+    "speaker": "Robert Platt",
+    "affiliation": "Northeastern University",
+    "why": "RL for manipulation — practical algorithms and structure-exploiting policies.",
+    "format": "Workshop invited talk",
+    "url": "https://rl4il-icra.github.io/",
+    "relevance": "core"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "09:00-09:45",
+    "workshop": "Riemannian Geometric Methods Tutorial",
+    "title": "Welcome and warm-up on Riemannian geometry for robotics",
+    "speaker": "Tutorial organizers (N. Jaquier, L. Rozo, S. Hauberg, H.-P. Schröcker, A. Kupcsik)",
+    "affiliation": "KTH / IIT / DTU / Innsbruck / Bosch CR",
+    "why": "Foundations every TC member will reuse: Lie groups, Riemannian manifolds, exponential maps, parallel transport.",
+    "format": "Tutorial",
+    "url": "https://sites.google.com/view/icra-2026-tutorial-geometry/",
+    "relevance": "core"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "09:10-09:30",
+    "workshop": "Synthetic Data for Robot Learning (SDRL)",
+    "title": "Invited talk",
+    "speaker": "Justin Carpentier",
+    "affiliation": "INRIA Paris",
+    "why": "Differentiable simulation for trajectory optimization and control — direct TC.",
+    "format": "Workshop invited talk",
+    "url": "https://sites.google.com/view/icra-2026-sdrl-workshop",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "09:15-10:15",
+    "workshop": "CR2 Contact-Rich Control & Representation",
+    "title": "Panel 1: Contact Model Representations",
+    "speaker": "Nima Fazeli, Marc Toussaint, Yuval Tassa, Yilun Du",
+    "affiliation": "Michigan / TU Berlin / DeepMind / Harvard",
+    "why": "Rigid vs compliant, learned vs analytical, GPU-accelerated, differentiable contact models — the inputs to every contact-rich planner.",
+    "format": "Workshop panel",
+    "url": "https://cr2-icra.github.io",
+    "relevance": "bullseye"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "09:30-10:00",
+    "workshop": "Frontiers of Optimization for Robotics",
+    "title": "A gap penalty semismooth method for QPCC with applications to contact-implicit trajectory optimization",
+    "speaker": "Toshiyuki Ohtsuka",
+    "affiliation": "Kyoto University",
+    "why": "Bullseye TC: solver-level methods for contact-implicit trajectory optimization.",
+    "format": "Workshop invited talk",
+    "url": "https://sites.google.com/robotics.utias.utoronto.ca/icra26-frontiers-optimization/home",
+    "relevance": "bullseye"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "09:30-10:00",
+    "workshop": "Generative Digital Twins (gDT-IV)",
+    "title": "Keynote: World Model Driven Embodied Intelligence",
+    "speaker": "Hengshuang Zhao",
+    "affiliation": "University of Hong Kong",
+    "why": "Physics-aware video generation; how world models feed sim-based policy training.",
+    "format": "Workshop keynote",
+    "url": "https://awesomedigitaltwin.github.io/2026_ICRA.html",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "09:30-10:00",
+    "workshop": "RL in the Era of Imitation Learning (RL4IL)",
+    "title": "Invited talk",
+    "speaker": "Pulkit Agrawal",
+    "affiliation": "MIT",
+    "why": "Sample-efficient RL and sim-to-real for control of dexterous and dynamic systems.",
+    "format": "Workshop invited talk",
+    "url": "https://rl4il-icra.github.io/",
+    "relevance": "core"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "09:30-09:50",
+    "workshop": "Synthetic Data for Robot Learning (SDRL)",
+    "title": "Invited talk",
+    "speaker": "Ming Lin",
+    "affiliation": "University of Maryland / Amazon",
+    "why": "Physics-based simulation foundations.",
+    "format": "Workshop invited talk",
+    "url": "https://sites.google.com/view/icra-2026-sdrl-workshop",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "09:45-10:30",
+    "workshop": "Riemannian Geometric Methods Tutorial",
+    "title": "Tutorial session: Riemannian latent variable models",
+    "speaker": "Tutorial organizers",
+    "affiliation": "—",
+    "why": "Manifold-aware latent representations for robot data — directly relevant for learned controllers and policies.",
+    "format": "Tutorial session",
+    "url": "https://sites.google.com/view/icra-2026-tutorial-geometry/",
+    "relevance": "core"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "09:50-10:10",
+    "workshop": "Synthetic Data for Robot Learning (SDRL)",
+    "title": "Invited talk",
+    "speaker": "Jiajun Wu",
+    "affiliation": "Stanford",
+    "why": "Physics-grounded synthetic data for control policy training.",
+    "format": "Workshop invited talk",
+    "url": "https://sites.google.com/view/icra-2026-sdrl-workshop",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "10:00-10:30",
+    "workshop": "Frontiers of Optimization for Robotics",
+    "title": "Invited talk (title TBA)",
+    "speaker": "Justin Carpentier",
+    "affiliation": "INRIA Paris",
+    "why": "Differentiable simulation, contact dynamics, Pinocchio. Bullseye TC.",
+    "format": "Workshop invited talk",
+    "url": "https://sites.google.com/robotics.utias.utoronto.ca/icra26-frontiers-optimization/home",
+    "relevance": "bullseye"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "10:00-10:30",
+    "workshop": "Generative Digital Twins (gDT-IV)",
+    "title": "Keynote: Accelerate Physical AI with Simulation-Centric Data Engine",
+    "speaker": "Steve Xie",
+    "affiliation": "Lightwheel",
+    "why": "Industry view of simulation infrastructure for control-policy data engines.",
+    "format": "Workshop keynote",
+    "url": "https://awesomedigitaltwin.github.io/2026_ICRA.html",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "10:00-10:30",
+    "workshop": "RL in the Era of Imitation Learning (RL4IL)",
+    "title": "Lightning Talks I",
+    "speaker": "Various authors",
+    "affiliation": "—",
+    "why": "Includes 'Behavior Cloning of MPC for 3-DOF Robotic Manipulators', 'Online Fine-Tuning of Pretrained Controllers for Autonomous Driving via Real-Time Recurrent RL', 'Tune to Learn: How Controller Gains Shape Robot Policy Learning'. Direct TC content.",
+    "format": "Workshop lightning talks",
+    "url": "https://rl4il-icra.github.io/",
+    "relevance": "core"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "10:15-11:00",
+    "workshop": "CR2 Contact-Rich Control & Representation",
+    "title": "Coffee + poster session",
+    "speaker": "—",
+    "affiliation": "—",
+    "why": "Posters include contact-implicit MPC for deformables (Bianchini/Posa), Lie-group QP solvers for LCP (Bishop/Manchester), predictive safety filters for quadruped locomotion, learning legged MPC with smooth surrogates.",
+    "format": "Workshop posters",
+    "url": "https://cr2-icra.github.io",
+    "relevance": "bullseye"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "10:30-10:45",
+    "workshop": "Frontiers of Optimization for Robotics",
+    "title": "Lightning Talks",
+    "speaker": "Selected authors",
+    "affiliation": "—",
+    "why": "Short contributed presentations; expect TC-relevant submissions.",
+    "format": "Workshop lightning talks",
+    "url": "https://sites.google.com/robotics.utias.utoronto.ca/icra26-frontiers-optimization/home",
+    "relevance": "bullseye"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "10:40-11:00",
+    "workshop": "Synthetic Data for Robot Learning (SDRL)",
+    "title": "Invited talk",
+    "speaker": "Sergey Zakharov",
+    "affiliation": "Toyota Research Institute",
+    "why": "Synthetic-data pipelines used in deployed policy stacks.",
+    "format": "Workshop invited talk",
+    "url": "https://sites.google.com/view/icra-2026-sdrl-workshop",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "11:00-12:00",
+    "workshop": "CR2 Contact-Rich Control & Representation",
+    "title": "Spotlight talks: Simulation, Modeling, Learning (incl. 'Tune to Learn: How Controller Gains Shape Robot Policy Learning')",
+    "speaker": "Invited spotlight presenters",
+    "affiliation": "—",
+    "why": "GPU-accelerated hydroelastic contact (Röstel et al.); compliant sphere-lattice contact; soft-object dexterity; how controller gains shape policy learning (Bronars/Park/Agrawal).",
+    "format": "Workshop spotlights",
+    "url": "https://cr2-icra.github.io",
+    "relevance": "bullseye"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "11:00-11:30",
+    "workshop": "Generative Digital Twins (gDT-IV)",
+    "title": "Keynote: Physical Grounding of Generative Digital Twins for Robotics",
+    "speaker": "Jiajun Wu",
+    "affiliation": "Stanford",
+    "why": "Physical structure (geometry, materials, properties) for sim2real-bridging twins.",
+    "format": "Workshop keynote",
+    "url": "https://awesomedigitaltwin.github.io/2026_ICRA.html",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "11:00-11:30",
+    "workshop": "RL in the Era of Imitation Learning (RL4IL)",
+    "title": "Invited talk",
+    "speaker": "Georgia Chalvatzaki",
+    "affiliation": "TU Darmstadt",
+    "why": "Active perception + manipulation; structured learning for embodied control.",
+    "format": "Workshop invited talk",
+    "url": "https://rl4il-icra.github.io/",
+    "relevance": "core"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "11:00-11:45",
+    "workshop": "Riemannian Geometric Methods Tutorial",
+    "title": "Practical session: Riemannian latent variable models",
+    "speaker": "Tutorial organizers",
+    "affiliation": "—",
+    "why": "Hands-on companion to the tutorial session — bring a laptop.",
+    "format": "Tutorial practical",
+    "url": "https://sites.google.com/view/icra-2026-tutorial-geometry/",
+    "relevance": "core"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "11:00-12:00",
+    "workshop": "Synthetic Data for Robot Learning (SDRL)",
+    "title": "Panel discussion",
+    "speaker": "Invited speakers",
+    "affiliation": "—",
+    "why": "Domain transfer, realism trade-offs, alignment with deployment for control.",
+    "format": "Workshop panel",
+    "url": "https://sites.google.com/view/icra-2026-sdrl-workshop",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "11:30-12:00",
+    "workshop": "Frontiers of Optimization for Robotics",
+    "title": "Beyond Discrete-Time MPC: Nonlinear Lifting and Intersample Optimization in Robotics",
+    "speaker": "Kaoru Yamamoto (remote)",
+    "affiliation": "Kyushu University",
+    "why": "Bullseye TC: continuous-time / intersample MPC formulations.",
+    "format": "Workshop invited talk (remote)",
+    "url": "https://sites.google.com/robotics.utias.utoronto.ca/icra26-frontiers-optimization/home",
+    "relevance": "bullseye"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "11:30-12:00",
+    "workshop": "Generative Digital Twins (gDT-IV)",
+    "title": "Keynote: Removing the Barriers to Simulation Adoption with Automated Environment Construction and Synthetic Data Generation",
+    "speaker": "Ajay Mandlekar",
+    "affiliation": "NVIDIA",
+    "why": "Auto-generation of digital twins/cousins from real video for real-to-sim-to-real policy training and evaluation.",
+    "format": "Workshop keynote",
+    "url": "https://awesomedigitaltwin.github.io/2026_ICRA.html",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "11:30-12:00",
+    "workshop": "RL in the Era of Imitation Learning (RL4IL)",
+    "title": "Invited talk",
+    "speaker": "Jason Ma",
+    "affiliation": "Dyna Robotics",
+    "why": "Reward learning and policy fine-tuning at industrial scale.",
+    "format": "Workshop invited talk",
+    "url": "https://rl4il-icra.github.io/",
+    "relevance": "core"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "11:40-12:25",
+    "workshop": "Dexterous Manipulation",
+    "title": "Panel Discussion 1",
+    "speaker": "Invited speakers",
+    "affiliation": "—",
+    "why": "Direct discussion on the right balance between model-free RL and hybrid planning/control approaches.",
+    "format": "Workshop panel",
+    "url": "https://dex-manipulation.github.io/icra2026/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "11:45-12:30",
+    "workshop": "Riemannian Geometric Methods Tutorial",
+    "title": "Invited talk (title TBD)",
+    "speaker": "Ross Hatton",
+    "affiliation": "Oregon State University",
+    "why": "Geometric mechanics of locomotion (connection forms, curvature, gauge-theoretic motion analysis) — classic motion-planning content. Title not yet published.",
+    "format": "Tutorial invited talk",
+    "url": "https://sites.google.com/view/icra-2026-tutorial-geometry/",
+    "relevance": "core"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "12:00-12:30",
+    "workshop": "Frontiers of Optimization for Robotics",
+    "title": "Non-smooth control for MuJoCo physics",
+    "speaker": "Emo Todorov",
+    "affiliation": "University of Washington",
+    "why": "Bullseye TC: nonsmooth control inside the MuJoCo physics engine. Todorov is MuJoCo's creator.",
+    "format": "Workshop invited talk",
+    "url": "https://sites.google.com/robotics.utias.utoronto.ca/icra26-frontiers-optimization/home",
+    "relevance": "bullseye"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "12:00-12:30",
+    "workshop": "RL in the Era of Imitation Learning (RL4IL)",
+    "title": "Panel: 'Reinforce or Imitate: Practical Challenges in RL with Real World Data'",
+    "speaker": "Invited speakers",
+    "affiliation": "—",
+    "why": "Practical recipe-level discussion on what does and doesn't work when you blend RL with IL for control.",
+    "format": "Workshop panel",
+    "url": "https://rl4il-icra.github.io/",
+    "relevance": "core"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "13:30-14:30",
+    "workshop": "CR2 Contact-Rich Control & Representation",
+    "title": "Panel 2: Algorithms for Contact-Rich Control",
+    "speaker": "Justin Carpentier, Bibit Bianchini, Hae-Won Park, Emo Todorov",
+    "affiliation": "INRIA / UPenn / KAIST / UW",
+    "why": "Bullseye TC content. Sampling vs differentiable simulation vs non-convex optimization; convergence and contact-mode discovery in local solvers.",
+    "format": "Workshop panel",
+    "url": "https://cr2-icra.github.io",
+    "relevance": "bullseye"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "13:30-14:00",
+    "workshop": "Frontiers of Optimization for Robotics",
+    "title": "Invited talk (title TBA)",
+    "speaker": "Farbod Farshidian",
+    "affiliation": "Robotics and AI Institute",
+    "why": "OCS2 toolbox; MPC for legged robots — production-quality optimization software.",
+    "format": "Workshop invited talk",
+    "url": "https://sites.google.com/robotics.utias.utoronto.ca/icra26-frontiers-optimization/home",
+    "relevance": "bullseye"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "13:40-14:00",
+    "workshop": "Synthetic Data for Robot Learning (SDRL)",
+    "title": "Invited talk",
+    "speaker": "Angela Schoellig",
+    "affiliation": "TU Munich",
+    "why": "Safe robot learning, MPC, and uncertainty for control. Bullseye TC voice.",
+    "format": "Workshop invited talk",
+    "url": "https://sites.google.com/view/icra-2026-sdrl-workshop",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "14:00-14:30",
+    "workshop": "Frontiers of Optimization for Robotics",
+    "title": "Invited talk (title TBA)",
+    "speaker": "Melanie Zeilinger",
+    "affiliation": "ETH Zurich",
+    "why": "Learning-based MPC, safe learning control. Bullseye TC.",
+    "format": "Workshop invited talk",
+    "url": "https://sites.google.com/robotics.utias.utoronto.ca/icra26-frontiers-optimization/home",
+    "relevance": "bullseye"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "14:00-14:30",
+    "workshop": "Generative Digital Twins (gDT-IV)",
+    "title": "Keynote: Digital Twins for Embodied AI",
+    "speaker": "Manolis Savva",
+    "affiliation": "Simon Fraser University",
+    "why": "Realism and interaction frontier of digital twins.",
+    "format": "Workshop keynote",
+    "url": "https://awesomedigitaltwin.github.io/2026_ICRA.html",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "14:00-14:30",
+    "workshop": "RL in the Era of Imitation Learning (RL4IL)",
+    "title": "Invited talk",
+    "speaker": "David Held",
+    "affiliation": "CMU",
+    "why": "Robot learning for manipulation; reward shaping and offline RL.",
+    "format": "Workshop invited talk",
+    "url": "https://rl4il-icra.github.io/",
+    "relevance": "core"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "14:00-14:45",
+    "workshop": "Riemannian Geometric Methods Tutorial",
+    "title": "Tutorial session: Riemannian generative models",
+    "speaker": "Tutorial organizers",
+    "affiliation": "—",
+    "why": "Generative models on manifolds — relevant for trajectory generation and policy synthesis under geometric structure.",
+    "format": "Tutorial session",
+    "url": "https://sites.google.com/view/icra-2026-tutorial-geometry/",
+    "relevance": "core"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "14:00-14:20",
+    "workshop": "Synthetic Data for Robot Learning (SDRL)",
+    "title": "Invited talk",
+    "speaker": "Jason Peng",
+    "affiliation": "Simon Fraser University / NVIDIA",
+    "why": "RL-based motion synthesis for legged/dynamic control.",
+    "format": "Workshop invited talk",
+    "url": "https://sites.google.com/view/icra-2026-sdrl-workshop",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "14:10-14:40",
+    "workshop": "Pedestrian Behavior Prediction (PBP)",
+    "title": "Invited talk",
+    "speaker": "Hubert P. H. Shum",
+    "affiliation": "Durham University",
+    "why": "Human motion modeling; feeds predictive planners.",
+    "format": "Workshop invited talk",
+    "url": "https://workshop-pbp2026.github.io/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "14:15-14:45",
+    "workshop": "AV Generalization (TUM)",
+    "title": "Distinguished talk 1",
+    "speaker": "Hongyang Li",
+    "affiliation": "University of Hong Kong",
+    "why": "End-to-end autonomous-driving stacks — planning/control implications.",
+    "format": "Workshop talk",
+    "url": "https://tum-avs.github.io/ICRA2026_Workshop/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "14:30-15:30",
+    "workshop": "CR2 Contact-Rich Control & Representation",
+    "title": "Spotlight talks: Control",
+    "speaker": "Various authors",
+    "affiliation": "—",
+    "why": "Distributionally robust control via Stein variational inference (Sathyanarayan et al.); branch-rejoining trajectory optimization under contact-timing uncertainty (Zhang/Zhao/Sun/Johnson/Khadiv); risk-aware domain randomization for sampling-based predictive control (Esteban/Li/Kurtz/Ames); Components of Contact: contact-implicit control on manipulation primitives (Sarmiento/Posa).",
+    "format": "Workshop spotlights",
+    "url": "https://cr2-icra.github.io",
+    "relevance": "bullseye"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "14:30-14:45",
+    "workshop": "Frontiers of Optimization for Robotics",
+    "title": "Lightning Talks",
+    "speaker": "Selected authors",
+    "affiliation": "—",
+    "why": "Short contributed presentations.",
+    "format": "Workshop lightning talks",
+    "url": "https://sites.google.com/robotics.utias.utoronto.ca/icra26-frontiers-optimization/home",
+    "relevance": "bullseye"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "14:30-15:00",
+    "workshop": "Generative Digital Twins (gDT-IV)",
+    "title": "Keynote (title TBA)",
+    "speaker": "Ingmar Posner",
+    "affiliation": "Oxford",
+    "why": "Probabilistic embodied intelligence — uncertainty in policy and decision-making.",
+    "format": "Workshop keynote",
+    "url": "https://awesomedigitaltwin.github.io/2026_ICRA.html",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "14:30-15:00",
+    "workshop": "RL in the Era of Imitation Learning (RL4IL)",
+    "title": "Lightning Talks II",
+    "speaker": "Various authors",
+    "affiliation": "—",
+    "why": "Covers further accepted papers including Q-value extraction from BC for on-robot RL and graph-based reward learning.",
+    "format": "Workshop lightning talks",
+    "url": "https://rl4il-icra.github.io/",
+    "relevance": "core"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "14:40-15:10",
+    "workshop": "Pedestrian Behavior Prediction (PBP)",
+    "title": "Invited talk",
+    "speaker": "Philippe Martinet",
+    "affiliation": "Inria Sophia Antipolis",
+    "why": "Long-running figure in autonomous vehicle motion planning; bridges prediction and control.",
+    "format": "Workshop invited talk",
+    "url": "https://workshop-pbp2026.github.io/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "14:45-15:15",
+    "workshop": "AV Generalization (TUM)",
+    "title": "Distinguished talk 2 + EDGAR public-road livestream",
+    "speaker": "Felix Fent",
+    "affiliation": "TU Munich",
+    "why": "Live demo of an autonomous vehicle on Munich public roads — open-source stack architecture matters for TC.",
+    "format": "Workshop talk + livestream",
+    "url": "https://tum-avs.github.io/ICRA2026_Workshop/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "14:45-16:00",
+    "workshop": "Frontiers of Optimization for Robotics",
+    "title": "Mentoring Breakout, Coffee Break and Posters",
+    "speaker": "Attendees",
+    "affiliation": "—",
+    "why": "Pioneering mentorship program during coffee break — TC members at all career stages can connect.",
+    "format": "Workshop mentoring + posters",
+    "url": "https://sites.google.com/robotics.utias.utoronto.ca/icra26-frontiers-optimization/home",
+    "relevance": "bullseye"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "14:45-15:30",
+    "workshop": "Riemannian Geometric Methods Tutorial",
+    "title": "Practical session: Riemannian generative models",
+    "speaker": "Tutorial organizers",
+    "affiliation": "—",
+    "why": "Hands-on companion to the generative-models tutorial.",
+    "format": "Tutorial practical",
+    "url": "https://sites.google.com/view/icra-2026-tutorial-geometry/",
+    "relevance": "core"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "14:50-15:10",
+    "workshop": "Synthetic Data for Robot Learning (SDRL)",
+    "title": "Invited talk",
+    "speaker": "Mansur Arief",
+    "affiliation": "Stanford Center for AI Safety",
+    "why": "Safety-critical scenario generation for AV planning/control.",
+    "format": "Workshop invited talk",
+    "url": "https://sites.google.com/view/icra-2026-sdrl-workshop",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "15:00-15:30",
+    "workshop": "Generative Digital Twins (gDT-IV)",
+    "title": "Keynote: Real2Render2Real — Scaling Robot Data Without Dynamics Simulation or Robot Hardware",
+    "speaker": "Ken Goldberg",
+    "affiliation": "UC Berkeley",
+    "why": "3DGS-based pipeline that generates training data for VLA / IL policies from a single human demo.",
+    "format": "Workshop keynote",
+    "url": "https://awesomedigitaltwin.github.io/2026_ICRA.html",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "15:10-15:40",
+    "workshop": "Pedestrian Behavior Prediction (PBP)",
+    "title": "Invited talk",
+    "speaker": "Amir Rasouli",
+    "affiliation": "Huawei Noah's Ark Lab",
+    "why": "Pedestrian intent prediction for autonomous driving — informs planner cost terms.",
+    "format": "Workshop invited talk",
+    "url": "https://workshop-pbp2026.github.io/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "15:10-15:30",
+    "workshop": "Synthetic Data for Robot Learning (SDRL)",
+    "title": "Invited talk",
+    "speaker": "Hugo Talbot",
+    "affiliation": "INRIA Nancy",
+    "why": "Soft-tissue and deformable simulation — relevant for surgical / soft-robot control.",
+    "format": "Workshop invited talk",
+    "url": "https://sites.google.com/view/icra-2026-sdrl-workshop",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "15:30-16:00",
+    "workshop": "RL in the Era of Imitation Learning (RL4IL)",
+    "title": "Invited talk",
+    "speaker": "Sergey Levine",
+    "affiliation": "UC Berkeley / Physical Intelligence",
+    "why": "Foundation policies for control; offline+online RL pipelines. High-impact.",
+    "format": "Workshop invited talk",
+    "url": "https://rl4il-icra.github.io/",
+    "relevance": "core"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "15:40-16:10",
+    "workshop": "Pedestrian Behavior Prediction (PBP)",
+    "title": "Invited talk",
+    "speaker": "Alexandre Alahi",
+    "affiliation": "EPFL",
+    "why": "Multi-modal trajectory forecasting under social interactions.",
+    "format": "Workshop invited talk",
+    "url": "https://workshop-pbp2026.github.io/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "16:00-16:30",
+    "workshop": "AV Generalization (TUM)",
+    "title": "Distinguished talk 3",
+    "speaker": "Kashyap Chitta",
+    "affiliation": "NVIDIA AV Research",
+    "why": "End-to-end planning models for AVs; what they imply for control architecture.",
+    "format": "Workshop talk",
+    "url": "https://tum-avs.github.io/ICRA2026_Workshop/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "16:00-16:30",
+    "workshop": "Frontiers of Optimization for Robotics",
+    "title": "Graphs of Convex Sets: A New Framework for Efficient Discrete-Continuous Optimization",
+    "speaker": "Tobia Marcucci",
+    "affiliation": "UC Santa Barbara",
+    "why": "Bullseye TC: GCS for motion planning — directly TC-relevant.",
+    "format": "Workshop invited talk",
+    "url": "https://sites.google.com/robotics.utias.utoronto.ca/icra26-frontiers-optimization/home",
+    "relevance": "bullseye"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "16:00-16:30",
+    "workshop": "Generative Digital Twins (gDT-IV)",
+    "title": "Keynote (title TBA)",
+    "speaker": "Oier Mees",
+    "affiliation": "Microsoft",
+    "why": "Language and policies for general-purpose robots.",
+    "format": "Workshop keynote",
+    "url": "https://awesomedigitaltwin.github.io/2026_ICRA.html",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "16:00-16:30",
+    "workshop": "RL in the Era of Imitation Learning (RL4IL)",
+    "title": "Invited talk",
+    "speaker": "Chelsea Finn",
+    "affiliation": "Stanford / Physical Intelligence",
+    "why": "Meta-learning + RL fine-tuning for adaptable control policies.",
+    "format": "Workshop invited talk",
+    "url": "https://rl4il-icra.github.io/",
+    "relevance": "core"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "16:00-16:45",
+    "workshop": "Riemannian Geometric Methods Tutorial",
+    "title": "Invited talk: Leveraging geometric symmetry in robotic policy learning",
+    "speaker": "Dian Wang",
+    "affiliation": "Stanford University",
+    "why": "Equivariant / symmetry-aware policy learning — direct TC content for learned control.",
+    "format": "Tutorial invited talk",
+    "url": "https://sites.google.com/view/icra-2026-tutorial-geometry/",
+    "relevance": "core"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "16:15-17:15",
+    "workshop": "CR2 Contact-Rich Control & Representation",
+    "title": "Panel 3: State and Future for Contact-Rich Control",
+    "speaker": "Matt Mason, Aaron Ames, Aaron Johnson, Dmitry Berenson",
+    "affiliation": "CMU / Caltech / CMU / Michigan",
+    "why": "Where the field goes next — long-form roadmap from key TC voices.",
+    "format": "Workshop panel",
+    "url": "https://cr2-icra.github.io",
+    "relevance": "bullseye"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "16:30-17:00",
+    "workshop": "AV Generalization (TUM)",
+    "title": "Distinguished talk 4",
+    "speaker": "Marco Pavone",
+    "affiliation": "Stanford / NVIDIA",
+    "why": "Decision-making, planning, and learning-based control for AVs. Senior TC voice.",
+    "format": "Workshop talk",
+    "url": "https://tum-avs.github.io/ICRA2026_Workshop/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "16:30-17:00",
+    "workshop": "Frontiers of Optimization for Robotics",
+    "title": "Scaling Semidefinite Relaxations for Robot Perception and Control",
+    "speaker": "Heng Yang",
+    "affiliation": "Harvard University",
+    "why": "Bullseye TC: certifiable / global optimization for control via SDP relaxations.",
+    "format": "Workshop invited talk",
+    "url": "https://sites.google.com/robotics.utias.utoronto.ca/icra26-frontiers-optimization/home",
+    "relevance": "bullseye"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "16:30-17:30",
+    "workshop": "Generative Digital Twins (gDT-IV)",
+    "title": "Panel discussion",
+    "speaker": "All keynote speakers",
+    "affiliation": "—",
+    "why": "Cross-keynote panel; how data engines feed the entire control-learning stack.",
+    "format": "Workshop panel",
+    "url": "https://awesomedigitaltwin.github.io/2026_ICRA.html",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "16:30-17:20",
+    "workshop": "Pedestrian Behavior Prediction (PBP)",
+    "title": "Paper presentations (incl. Brave New Ideas track)",
+    "speaker": "Various authors",
+    "affiliation": "—",
+    "why": "Predictive planning and control are explicit topics of interest; expect TC-relevant submissions.",
+    "format": "Workshop papers",
+    "url": "https://workshop-pbp2026.github.io/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "16:35-17:20",
+    "workshop": "Dexterous Manipulation",
+    "title": "Panel Discussion 2",
+    "speaker": "Invited speakers",
+    "affiliation": "—",
+    "why": "Future directions for dexterous control architectures.",
+    "format": "Workshop panel",
+    "url": "https://dex-manipulation.github.io/icra2026/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "16:45-17:15",
+    "workshop": "Riemannian Geometric Methods Tutorial",
+    "title": "Invited talk: Geometric Algebra, Riemannian Geometry, and Quantum Computing for Robotics Modeling, Learning and Control",
+    "speaker": "Eduardo Bayro-Corrochano",
+    "affiliation": "(affiliation TBA — long-time geometric-algebra researcher, CINVESTAV Guadalajara)",
+    "why": "Geometric algebra applied across modeling, learning, and control. Bullseye TC.",
+    "format": "Tutorial invited talk",
+    "url": "https://sites.google.com/view/icra-2026-tutorial-geometry/",
+    "relevance": "core"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "17:00-17:30",
+    "workshop": "Frontiers of Optimization for Robotics",
+    "title": "Invited talk (title TBA)",
+    "speaker": "Evangelos Theodorou",
+    "affiliation": "Georgia Tech",
+    "why": "Stochastic optimal control, MPPI / sampling-based MPC. Bullseye TC.",
+    "format": "Workshop invited talk",
+    "url": "https://sites.google.com/robotics.utias.utoronto.ca/icra26-frontiers-optimization/home",
+    "relevance": "bullseye"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "17:15-17:45",
+    "workshop": "AV Generalization (TUM)",
+    "title": "Distinguished talk 5",
+    "speaker": "Cristina Olaverri-Monreal",
+    "affiliation": "JKU Linz",
+    "why": "ITS validation and on-road evaluation of AV behavior.",
+    "format": "Workshop talk",
+    "url": "https://tum-avs.github.io/ICRA2026_Workshop/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "17:15-17:30",
+    "workshop": "Riemannian Geometric Methods Tutorial",
+    "title": "Closing words",
+    "speaker": "Tutorial organizers",
+    "affiliation": "—",
+    "why": "Wrap-up.",
+    "format": "Tutorial closing",
+    "url": "https://sites.google.com/view/icra-2026-tutorial-geometry/",
+    "relevance": "core"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "17:30-18:00",
+    "workshop": "Frontiers of Optimization for Robotics",
+    "title": "Panel Discussion",
+    "speaker": "Workshop speakers",
+    "affiliation": "—",
+    "why": "Synthesis across the day — model-based vs learning-based optimization for robotics.",
+    "format": "Workshop panel",
+    "url": "https://sites.google.com/robotics.utias.utoronto.ca/icra26-frontiers-optimization/home",
+    "relevance": "bullseye"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "time": "18:00",
+    "workshop": "Frontiers of Optimization for Robotics",
+    "title": "Closing remarks and end of workshop",
+    "speaker": "Organizers",
+    "affiliation": "—",
+    "why": "Workshop end (note: this workshop runs to 18:00, slightly past the standard 17:30 ICRA workshop end).",
+    "format": "Workshop closing",
+    "url": "https://sites.google.com/robotics.utias.utoronto.ca/icra26-frontiers-optimization/home",
+    "relevance": "bullseye"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "08:30-09:45",
+    "workshop": "AI-Driven Safe Aerial Robotics",
+    "title": "Session: AI Paradigms for Safety in Aerial Robotics",
+    "speaker": "Nora Ayanian, Daniele Palossi, Elia Kaufmann (chair: Anibal Ollero)",
+    "affiliation": "Brown / SUPSI-IDSIA / Skydio",
+    "why": "Collision avoidance, embodied AI on tiny robots, reliable visual nav — all squarely TC.",
+    "format": "Workshop session",
+    "url": "https://aerial-robotics-workshop-icra.com/agenda/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "08:30-09:45",
+    "workshop": "AI-Driven Safe Aerial Robotics",
+    "title": "Talk: Collision Avoidance in Aerial Vehicles",
+    "speaker": "Nora Ayanian",
+    "affiliation": "Brown University",
+    "why": "Multi-agent UAV collision avoidance.",
+    "format": "Workshop talk",
+    "url": "https://aerial-robotics-workshop-icra.com/agenda/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "08:30-09:45",
+    "workshop": "AI-Driven Safe Aerial Robotics",
+    "title": "Talk: Embodied AI on Tiny Robots",
+    "speaker": "Daniele Palossi",
+    "affiliation": "SUPSI-IDSIA",
+    "why": "Compute-constrained learning-based control for nano-drones.",
+    "format": "Workshop talk",
+    "url": "https://aerial-robotics-workshop-icra.com/agenda/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "08:30-09:45",
+    "workshop": "AI-Driven Safe Aerial Robotics",
+    "title": "Talk: Reliable Visual Navigation, Anytime, Anywhere",
+    "speaker": "Elia Kaufmann",
+    "affiliation": "Skydio",
+    "why": "Industry-grade visual-navigation control stacks. Direct TC.",
+    "format": "Workshop talk",
+    "url": "https://aerial-robotics-workshop-icra.com/agenda/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "08:40-09:10",
+    "workshop": "VLA Pipelines for Real Robots",
+    "title": "Invited talk",
+    "speaker": "Shuran Song",
+    "affiliation": "Stanford",
+    "why": "Robot learning + perception architectures for control policies.",
+    "format": "Workshop invited talk",
+    "url": "https://icra2026vlapipeline.github.io/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "08:45-09:15",
+    "workshop": "Uncertainty in Open-World Robotics",
+    "title": "Invited talk: Large Language-Vision Models in Robot Manipulation (tentative)",
+    "speaker": "Baoru Huang",
+    "affiliation": "University of Liverpool",
+    "why": "Uncertainty in VLM-driven manipulation control.",
+    "format": "Workshop invited talk",
+    "url": "https://uncertainty-in-robotics.github.io/program.html",
+    "relevance": "core"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "09:00-09:30",
+    "workshop": "Beyond Teleoperation",
+    "title": "Invited talk",
+    "speaker": "Jitendra Malik",
+    "affiliation": "UC Berkeley",
+    "why": "Vision + action perspective on extracting control-relevant signals from human video.",
+    "format": "Workshop invited talk",
+    "url": "https://icra-beyond-teleop.github.io/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "09:00-09:30",
+    "workshop": "Field Robotics",
+    "title": "Invited talk: Development of a highly maneuverable AUV for benthic survey",
+    "speaker": "Stefan Williams",
+    "affiliation": "University of Sydney",
+    "why": "Marine field-deployable autonomy.",
+    "format": "Workshop invited talk",
+    "url": "https://norlab-ulaval.github.io/icra_workshop_field_robotics/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "09:00-09:10",
+    "workshop": "Geometry in the Age of Data-Driven Robotics",
+    "title": "Opening remarks",
+    "speaker": "Organizers (R. Laha, T. Löw, J. Welde)",
+    "affiliation": "Northeastern / UW / Cornell",
+    "why": "Setup for three structured pro/contra debates on geometry's role in modern robotics.",
+    "format": "Workshop opening",
+    "url": "https://geometric-robotics.github.io/icra-2026-workshop/",
+    "relevance": "bullseye"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "09:00-17:30",
+    "workshop": "Long-term Human Motion Prediction (LHMP)",
+    "title": "Full-day workshop — published schedule has time blocks but no name-to-slot mapping yet",
+    "speaker": "Speakers (block assignment TBA): K. Driggs-Campbell, D. Kulic, J. Oh, L. Schmid, K. Chitta, J. Betz, T. Pfeifer, D. Woollard, A. Corbetta",
+    "affiliation": "Illinois / Monash / CMU / UTN / NVIDIA / TUM / Siemens / Standard AI / TU/e",
+    "why": "Predictive planning and control are explicit topics. Schedule structure: 09:10-10:40 invited+spotlights, 11:00-12:00 invited+spotlights, 13:00-15:00 junior panel + 2 invited, 16:00-17:20 three invited talks.",
+    "format": "Workshop",
+    "url": "https://motionpredictionicra2026.github.io/",
+    "relevance": "core"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "09:00-17:30",
+    "workshop": "Xplore: Cross-Disciplinary Exploration",
+    "title": "Full-day workshop (per-slot times TBA)",
+    "speaker": "Organizers (Z. Ajanovic, M. Popovic, P. Verma)",
+    "affiliation": "UAS Technikum Wien / TU Delft / IIT Madras",
+    "why": "Bridges RL, search, and robotics communities around exploration as a unifying challenge.",
+    "format": "Workshop",
+    "url": "https://xplore-workshop.github.io/",
+    "relevance": "core"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "09:10-10:00",
+    "workshop": "Geometry in the Age of Data-Driven Robotics",
+    "title": "Debate Q1 (Education): Is geometry a top priority for robotics education?",
+    "speaker": "Pro: Seth Hutchinson, Stefano Stramigioli; Contra: Frank Park, Noémie Jaquier",
+    "affiliation": "Northeastern / Twente / SNU / KTH",
+    "why": "Will frame how the next generation of TC researchers is being trained.",
+    "format": "Workshop debate",
+    "url": "https://geometric-robotics.github.io/icra-2026-workshop/",
+    "relevance": "bullseye"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "09:10-09:35",
+    "workshop": "Semantics for Reliable Robot Autonomy",
+    "title": "Invited talk: Reasoning VLA Models for Vehicle Autonomy",
+    "speaker": "Marco Pavone",
+    "affiliation": "Stanford / NVIDIA",
+    "why": "Reasoning-enabled VLA architectures for AV planning and control.",
+    "format": "Workshop invited talk",
+    "url": "https://www.dynsyslab.org/icra2026-workshop-on-semantics-for-reliable-robot-autonomy/",
+    "relevance": "core"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "09:10-09:40",
+    "workshop": "VLA Pipelines for Real Robots",
+    "title": "Invited talk",
+    "speaker": "Katherine Liu",
+    "affiliation": "Toyota Research Institute",
+    "why": "Production VLA pipelines and deployment.",
+    "format": "Workshop invited talk",
+    "url": "https://icra2026vlapipeline.github.io/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "09:15-09:45",
+    "workshop": "Uncertainty in Open-World Robotics",
+    "title": "Invited talk (TBD)",
+    "speaker": "Marija Popović",
+    "affiliation": "TU Delft",
+    "why": "Active perception / informative path planning under uncertainty — directly TC.",
+    "format": "Workshop invited talk",
+    "url": "https://uncertainty-in-robotics.github.io/program.html",
+    "relevance": "core"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "09:30-10:00",
+    "workshop": "Beyond Teleoperation",
+    "title": "Invited talk",
+    "speaker": "Edward Johns",
+    "affiliation": "Imperial College London",
+    "why": "Few-shot imitation learning — bridges to learned control.",
+    "format": "Workshop invited talk",
+    "url": "https://icra-beyond-teleop.github.io/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "09:35-10:00",
+    "workshop": "Semantics for Reliable Robot Autonomy",
+    "title": "Invited talk: Building and Reasoning with Vision-Language Maps for Embodied AI",
+    "speaker": "Angel Chang",
+    "affiliation": "Simon Fraser University",
+    "why": "Map representations for downstream planning — TC-adjacent.",
+    "format": "Workshop invited talk",
+    "url": "https://www.dynsyslab.org/icra2026-workshop-on-semantics-for-reliable-robot-autonomy/",
+    "relevance": "core"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "09:40-10:10",
+    "workshop": "VLA Pipelines for Real Robots",
+    "title": "Invited talk: VLAs in Manufacturing",
+    "speaker": "Alberto Rodriguez",
+    "affiliation": "Boston Dynamics",
+    "why": "Industrial-scale deployment of learned manipulation policies.",
+    "format": "Workshop invited talk",
+    "url": "https://icra2026vlapipeline.github.io/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "09:45-11:00",
+    "workshop": "AI-Driven Safe Aerial Robotics",
+    "title": "Session: Soft & Morphing Aerial Robotics for Safe Interaction",
+    "speaker": "Kevin Chen, Robert Katzschmann, Moju Zhao (chair: David Shim)",
+    "affiliation": "MIT / ETH / U Tokyo",
+    "why": "Includes 'Aggressive acrobatics in insect-scale aerial robots via deep-learned MPC' — bullseye TC.",
+    "format": "Workshop session",
+    "url": "https://aerial-robotics-workshop-icra.com/agenda/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "09:45-11:00",
+    "workshop": "AI-Driven Safe Aerial Robotics",
+    "title": "Talk: Aggressive Acrobatics in Insect-Scale Aerial Robots via Deep-Learned MPC",
+    "speaker": "Kevin Chen",
+    "affiliation": "MIT",
+    "why": "Direct TC: deep-learned MPC for aggressive flight.",
+    "format": "Workshop talk",
+    "url": "https://aerial-robotics-workshop-icra.com/agenda/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "09:45-10:15",
+    "workshop": "Uncertainty in Open-World Robotics",
+    "title": "Invited talk: Scalable Multi-Agent Navigation: Hierarchical Planning Under Real-World Uncertainty",
+    "speaker": "Nicholas Roy",
+    "affiliation": "MIT",
+    "why": "Bullseye TC: hierarchical planning under uncertainty for multi-agent navigation.",
+    "format": "Workshop invited talk",
+    "url": "https://uncertainty-in-robotics.github.io/program.html",
+    "relevance": "core"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "10:00-10:20",
+    "workshop": "Geometry in the Age of Data-Driven Robotics",
+    "title": "Discussion Q1 (Education) + interactive polling",
+    "speaker": "Audience + panelists",
+    "affiliation": "—",
+    "why": "Audience polling on geometric content vs ML in curricula.",
+    "format": "Workshop discussion",
+    "url": "https://geometric-robotics.github.io/icra-2026-workshop/",
+    "relevance": "bullseye"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "10:00-10:25",
+    "workshop": "Semantics for Reliable Robot Autonomy",
+    "title": "Invited talk: Spatio-Temporal Reasoning over Objects and Humans",
+    "speaker": "Lukas Schmid",
+    "affiliation": "MIT",
+    "why": "Dynamic scene understanding feeding planners.",
+    "format": "Workshop invited talk",
+    "url": "https://www.dynsyslab.org/icra2026-workshop-on-semantics-for-reliable-robot-autonomy/",
+    "relevance": "core"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "10:10-10:40",
+    "workshop": "Multi-Agent Robotic Systems (SCI-MARS)",
+    "title": "Oral presentations 1",
+    "speaker": "Selected authors",
+    "affiliation": "—",
+    "why": "Likely TC-relevant accepted-paper orals.",
+    "format": "Workshop orals",
+    "url": "https://mars-eai.github.io/ICRA-SCI-MARS-Webpage/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "10:10-11:00",
+    "workshop": "VLA Pipelines for Real Robots",
+    "title": "Panel: Building Reliable VLA Pipelines",
+    "speaker": "Moderator + panelists",
+    "affiliation": "—",
+    "why": "Reliability + safety of learned policies — direct TC concern.",
+    "format": "Workshop panel",
+    "url": "https://icra2026vlapipeline.github.io/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "10:20-10:30",
+    "workshop": "Geometry in the Age of Data-Driven Robotics",
+    "title": "Spotlight talks",
+    "speaker": "Junior researchers",
+    "affiliation": "—",
+    "why": "Geometry-focused contributed work.",
+    "format": "Workshop spotlights",
+    "url": "https://geometric-robotics.github.io/icra-2026-workshop/",
+    "relevance": "bullseye"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "10:50-11:20",
+    "workshop": "Field Robotics",
+    "title": "Invited talk: Autonomous Robotic Inspection on Ship Hulls and Storage Tanks",
+    "speaker": "Cédric Pradalier",
+    "affiliation": "Georgia Tech Europe",
+    "why": "Field deployment of inspection control stacks.",
+    "format": "Workshop invited talk",
+    "url": "https://norlab-ulaval.github.io/icra_workshop_field_robotics/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "11:00-11:30",
+    "workshop": "Beyond Teleoperation",
+    "title": "Invited talk",
+    "speaker": "Danfei Xu",
+    "affiliation": "Georgia Tech",
+    "why": "Long-horizon manipulation policies; planning + learning.",
+    "format": "Workshop invited talk",
+    "url": "https://icra-beyond-teleop.github.io/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "11:00-11:50",
+    "workshop": "Geometry in the Age of Data-Driven Robotics",
+    "title": "Debate Q2 (Research): Are the interesting research questions on geometry already answered?",
+    "speaker": "Pro: Patrick Wensing, Antonio Franchi; Contra: Andreas Müller, Georgia Chalvatzaki",
+    "affiliation": "Notre Dame / Sapienza-Twente / JKU / TU Darmstadt",
+    "why": "Bullseye TC content — directly debates whether geometric methods still drive new control/planning research.",
+    "format": "Workshop debate",
+    "url": "https://geometric-robotics.github.io/icra-2026-workshop/",
+    "relevance": "bullseye"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "11:15-11:40",
+    "workshop": "Semantics for Reliable Robot Autonomy",
+    "title": "Invited talk: Diverse Intelligences: Humans, Robots and Mycelium",
+    "speaker": "Janet Wiles",
+    "affiliation": "University of Queensland",
+    "why": "Cognitive-science perspective on robot reasoning.",
+    "format": "Workshop invited talk",
+    "url": "https://www.dynsyslab.org/icra2026-workshop-on-semantics-for-reliable-robot-autonomy/",
+    "relevance": "core"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "11:20-11:50",
+    "workshop": "Field Robotics",
+    "title": "Invited talk: Field-deployable maritime autonomy through energy-aware planning, docking, and coordination",
+    "speaker": "Nina Mahmoudian",
+    "affiliation": "Purdue University",
+    "why": "Bullseye TC: energy-aware planning and coordination for maritime AUVs.",
+    "format": "Workshop invited talk",
+    "url": "https://norlab-ulaval.github.io/icra_workshop_field_robotics/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "11:30-12:45",
+    "workshop": "AI-Driven Safe Aerial Robotics",
+    "title": "Session: Bio-Inspired Intelligence and Generative Design",
+    "speaker": "Sophie Armanini, Barbara Mazzolai, Pakpong Chirarattananon (chair: Raphael Zufferey)",
+    "affiliation": "Imperial / IIT / Toronto",
+    "why": "Co-design of morphology and control for agile flight.",
+    "format": "Workshop session",
+    "url": "https://aerial-robotics-workshop-icra.com/agenda/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "11:30-12:00",
+    "workshop": "Beyond Teleoperation",
+    "title": "Invited talk",
+    "speaker": "Karen Liu",
+    "affiliation": "Stanford",
+    "why": "Physics-based character control / animation crossover.",
+    "format": "Workshop invited talk",
+    "url": "https://icra-beyond-teleop.github.io/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "11:30-12:00",
+    "workshop": "VLA Pipelines for Real Robots",
+    "title": "Invited talk: Trustworthy Learning under Uncertainty",
+    "speaker": "Masha Itkina",
+    "affiliation": "Toyota Research Institute",
+    "why": "Uncertainty-aware learned control. Direct TC.",
+    "format": "Workshop invited talk",
+    "url": "https://icra2026vlapipeline.github.io/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "11:40-12:05",
+    "workshop": "Semantics for Reliable Robot Autonomy",
+    "title": "Invited talk: Language as a Connective Tissue for Robotics",
+    "speaker": "Karol Hausman",
+    "affiliation": "Physical Intelligence",
+    "why": "Language-conditioned policies and control.",
+    "format": "Workshop invited talk",
+    "url": "https://www.dynsyslab.org/icra2026-workshop-on-semantics-for-reliable-robot-autonomy/",
+    "relevance": "core"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "11:45-12:15",
+    "workshop": "Uncertainty in Open-World Robotics",
+    "title": "Highlight Posters Presentation",
+    "speaker": "Selected authors",
+    "affiliation": "—",
+    "why": "Best-of-poster oral previews; bring questions on how authors handle uncertainty in control loops.",
+    "format": "Workshop posters",
+    "url": "https://uncertainty-in-robotics.github.io/program.html",
+    "relevance": "core"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "11:50-12:10",
+    "workshop": "Geometry in the Age of Data-Driven Robotics",
+    "title": "Discussion Q2 (Research)",
+    "speaker": "Audience + panelists",
+    "affiliation": "—",
+    "why": "Continued discussion of geometric structure vs learned representations.",
+    "format": "Workshop discussion",
+    "url": "https://geometric-robotics.github.io/icra-2026-workshop/",
+    "relevance": "bullseye"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "12:00-12:30",
+    "workshop": "Beyond Teleoperation",
+    "title": "Invited talk",
+    "speaker": "Katerina Fragkiadaki",
+    "affiliation": "CMU",
+    "why": "Action representations from video.",
+    "format": "Workshop invited talk",
+    "url": "https://icra-beyond-teleop.github.io/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "12:05-12:50",
+    "workshop": "Semantics for Reliable Robot Autonomy",
+    "title": "Theme A Panel: Environment Perception and Contextual Reasoning",
+    "speaker": "Theme A speakers",
+    "affiliation": "—",
+    "why": "Bridges representation choices to downstream planning/control needs (differentiability, uncertainty quantification).",
+    "format": "Workshop panel",
+    "url": "https://www.dynsyslab.org/icra2026-workshop-on-semantics-for-reliable-robot-autonomy/",
+    "relevance": "core"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "13:10-14:10",
+    "workshop": "Field Robotics",
+    "title": "Keynote: Scaling field robotics in the age of LLMs",
+    "speaker": "Nicholas Roy",
+    "affiliation": "MIT",
+    "why": "How learned high-level reasoning interacts with planning and control in real outdoor systems.",
+    "format": "Workshop keynote",
+    "url": "https://norlab-ulaval.github.io/icra_workshop_field_robotics/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "13:30-14:00",
+    "workshop": "Beyond Teleoperation",
+    "title": "Invited talk",
+    "speaker": "Yue Wang",
+    "affiliation": "USC",
+    "why": "World models / scene reconstruction for control policy training.",
+    "format": "Workshop invited talk",
+    "url": "https://icra-beyond-teleop.github.io/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "13:30-14:00",
+    "workshop": "Uncertainty in Open-World Robotics",
+    "title": "Invited talk (TBD)",
+    "speaker": "Abhinav Valada",
+    "affiliation": "University of Freiburg",
+    "why": "Uncertainty-aware perception and learned navigation policies.",
+    "format": "Workshop invited talk",
+    "url": "https://uncertainty-in-robotics.github.io/program.html",
+    "relevance": "core"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "13:30-14:00",
+    "workshop": "VLA Pipelines for Real Robots",
+    "title": "Invited talk",
+    "speaker": "Yuke Zhu",
+    "affiliation": "NVIDIA / UT Austin",
+    "why": "Embodied AI architectures for manipulation control.",
+    "format": "Workshop invited talk",
+    "url": "https://icra2026vlapipeline.github.io/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "13:50-14:20",
+    "workshop": "Multi-Agent Robotic Systems (SCI-MARS)",
+    "title": "Oral presentations 2",
+    "speaker": "Selected authors",
+    "affiliation": "—",
+    "why": "—",
+    "format": "Workshop orals",
+    "url": "https://mars-eai.github.io/ICRA-SCI-MARS-Webpage/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "14:00-15:15",
+    "workshop": "AI-Driven Safe Aerial Robotics",
+    "title": "Session: From Safety Research to Deployment",
+    "speaker": "Fabrizio Schiano, Vijay Kumar, Guido de Croon, Hyun Lim (chair: Giuseppe Loianno)",
+    "affiliation": "Leonardo / UPenn / TU Delft / UViFy",
+    "why": "Includes Vijay Kumar on 'Toward Physical AI: Autonomy, Collaboration, and Language-Guided Behavior' — senior TC voice on planning/control.",
+    "format": "Workshop session",
+    "url": "https://aerial-robotics-workshop-icra.com/agenda/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "14:00-15:15",
+    "workshop": "AI-Driven Safe Aerial Robotics",
+    "title": "Talk: Toward Physical AI — Autonomy, Collaboration, and Language-Guided Behavior in Robotic Systems",
+    "speaker": "Vijay Kumar",
+    "affiliation": "UPenn",
+    "why": "Bullseye TC: planning, control, and coordination for aerial systems.",
+    "format": "Workshop talk",
+    "url": "https://aerial-robotics-workshop-icra.com/agenda/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "14:00-15:15",
+    "workshop": "AI-Driven Safe Aerial Robotics",
+    "title": "Talk: De-risking Autonomy — Leonardo's approach to safe and reliable autonomous systems",
+    "speaker": "Fabrizio Schiano",
+    "affiliation": "Leonardo",
+    "why": "Industry view on certifying autonomous control.",
+    "format": "Workshop talk",
+    "url": "https://aerial-robotics-workshop-icra.com/agenda/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "14:00-15:15",
+    "workshop": "AI-Driven Safe Aerial Robotics",
+    "title": "Talk: Bio-inspired AI for inherently safe, lightweight flying robots",
+    "speaker": "Guido de Croon",
+    "affiliation": "TU Delft",
+    "why": "Lightweight / minimalist control architectures.",
+    "format": "Workshop talk",
+    "url": "https://aerial-robotics-workshop-icra.com/agenda/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "14:00-15:15",
+    "workshop": "AI-Driven Safe Aerial Robotics",
+    "title": "Talk: Large-Scale Drone Swarm for Aerial Entertainment — Lessons Learned from Hundreds to Thousands of Units",
+    "speaker": "Hyun Lim",
+    "affiliation": "UViFy",
+    "why": "Multi-UAV coordination at scale — practical TC content.",
+    "format": "Workshop talk",
+    "url": "https://aerial-robotics-workshop-icra.com/agenda/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "14:00-14:30",
+    "workshop": "Beyond Teleoperation",
+    "title": "Invited talk",
+    "speaker": "Roberto Martín-Martín",
+    "affiliation": "UT Austin",
+    "why": "Robot learning from human and simulation data — bridges to deployed control.",
+    "format": "Workshop invited talk",
+    "url": "https://icra-beyond-teleop.github.io/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "14:00-14:50",
+    "workshop": "Geometry in the Age of Data-Driven Robotics",
+    "title": "Debate Q3 (Communication): Does mathematical jargon raise the field's barrier to entry?",
+    "speaker": "Pro: Ross Hatton, Zachary Manchester; Contra: Nadia Figueroa, Bruno Adorno",
+    "affiliation": "Oregon State / MIT / UPenn / Manchester",
+    "why": "How TC members communicate methods to industry / funders / public.",
+    "format": "Workshop debate",
+    "url": "https://geometric-robotics.github.io/icra-2026-workshop/",
+    "relevance": "bullseye"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "14:00-14:10",
+    "workshop": "Manipulation Robustness",
+    "title": "Opening and Goals",
+    "speaker": "Organizers",
+    "affiliation": "—",
+    "why": "Frames principles and pathways to human-level robustness.",
+    "format": "Workshop opening",
+    "url": "https://manipulation-robustness.github.io/icra2026/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "14:00-14:30",
+    "workshop": "Uncertainty in Open-World Robotics",
+    "title": "Invited talk: Understanding the 3D World for a General Agent",
+    "speaker": "Siyuan Huang",
+    "affiliation": "UniTree / BIGAI",
+    "why": "Embodied 3D understanding — feeds into uncertainty-aware planning.",
+    "format": "Workshop invited talk",
+    "url": "https://uncertainty-in-robotics.github.io/program.html",
+    "relevance": "core"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "14:00-14:30",
+    "workshop": "VLA Pipelines for Real Robots",
+    "title": "Invited talk",
+    "speaker": "Tetsuya Ogata",
+    "affiliation": "Waseda University",
+    "why": "Multimodal learning for manipulation.",
+    "format": "Workshop invited talk",
+    "url": "https://icra2026vlapipeline.github.io/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "14:05-14:30",
+    "workshop": "Semantics for Reliable Robot Autonomy",
+    "title": "Invited talk: LLM-Enabled Robots: Jailbreaking Attacks and Defenses",
+    "speaker": "George Pappas",
+    "affiliation": "University of Pennsylvania",
+    "why": "Safety and adversarial robustness for language-driven robot policies. Bullseye TC for safe-control crowd.",
+    "format": "Workshop invited talk",
+    "url": "https://www.dynsyslab.org/icra2026-workshop-on-semantics-for-reliable-robot-autonomy/",
+    "relevance": "core"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "14:10-15:30",
+    "workshop": "Manipulation Robustness",
+    "title": "Invited Talks 1-4 (20 min each, 7 speakers split across sessions)",
+    "speaker": "Among: Andrea Bajcsy, Haozhi Qi, Jan Peters, Jie Song, Josie Hughes, Oliver Brock, Shuran Song",
+    "affiliation": "CMU / UChicago-Amazon / TU Darmstadt / HKUST-GZ / EPFL / TU Berlin / Stanford",
+    "why": "Andrea Bajcsy + Jan Peters are direct TC voices on safe/robust control under uncertainty.",
+    "format": "Workshop talks",
+    "url": "https://manipulation-robustness.github.io/icra2026/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "14:30-14:55",
+    "workshop": "Semantics for Reliable Robot Autonomy",
+    "title": "Invited talk: Building an Adaptable Generalist Robot: A Human-Centered Perspective",
+    "speaker": "Mengdi Xu",
+    "affiliation": "Tsinghua University",
+    "why": "Adaptable / safe generalist policies.",
+    "format": "Workshop invited talk",
+    "url": "https://www.dynsyslab.org/icra2026-workshop-on-semantics-for-reliable-robot-autonomy/",
+    "relevance": "core"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "15:45-16:10",
+    "workshop": "Semantics for Reliable Robot Autonomy",
+    "title": "Invited talk: Semantic Queries of Robot Data",
+    "speaker": "Ken Goldberg",
+    "affiliation": "UC Berkeley",
+    "why": "Data-centric semantic interfaces for robot policy stacks.",
+    "format": "Workshop invited talk",
+    "url": "https://www.dynsyslab.org/icra2026-workshop-on-semantics-for-reliable-robot-autonomy/",
+    "relevance": "core"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "16:00-17:00",
+    "workshop": "Geometry in the Age of Data-Driven Robotics",
+    "title": "Full Panel Discussion",
+    "speaker": "All panelists",
+    "affiliation": "—",
+    "why": "Synthesis across all three debates.",
+    "format": "Workshop panel",
+    "url": "https://geometric-robotics.github.io/icra-2026-workshop/",
+    "relevance": "bullseye"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "16:00-17:00",
+    "workshop": "Manipulation Robustness",
+    "title": "Invited Talks 5-7 (continued)",
+    "speaker": "Remaining of the 7 invited speakers",
+    "affiliation": "—",
+    "why": "Continued.",
+    "format": "Workshop talks",
+    "url": "https://manipulation-robustness.github.io/icra2026/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "16:10-16:40",
+    "workshop": "Field Robotics",
+    "title": "Invited talk: LiDAR-centric Navigation for Field Drones",
+    "speaker": "Fu Zhang",
+    "affiliation": "University of Hong Kong",
+    "why": "FAST-LIO + planning for field UAVs. Direct TC.",
+    "format": "Workshop invited talk",
+    "url": "https://norlab-ulaval.github.io/icra_workshop_field_robotics/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "16:10-16:35",
+    "workshop": "Semantics for Reliable Robot Autonomy",
+    "title": "Invited talk: Semantics for Robot Task Execution Monitoring",
+    "speaker": "Dongheui Lee",
+    "affiliation": "TU Wien / DLR",
+    "why": "Execution monitoring for safe robot task execution — feeds the control supervision layer.",
+    "format": "Workshop invited talk",
+    "url": "https://www.dynsyslab.org/icra2026-workshop-on-semantics-for-reliable-robot-autonomy/",
+    "relevance": "core"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "16:20-17:20",
+    "workshop": "Beyond Teleoperation",
+    "title": "Panel: Beyond Teleoperation — moving toward general-purpose manipulation",
+    "speaker": "Invited speakers",
+    "affiliation": "—",
+    "why": "Practical recipe-level discussion on data sources for control-policy training.",
+    "format": "Workshop panel",
+    "url": "https://icra-beyond-teleop.github.io/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "16:30-17:15",
+    "workshop": "Intelligent Space Robotics and Systems",
+    "title": "Panel / Round Table",
+    "speaker": "All invited speakers",
+    "affiliation": "—",
+    "why": "Constraints, edge cases, future of space autonomy.",
+    "format": "Workshop panel",
+    "url": "https://space-robotics-workshop.github.io/icra2026/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "16:30-17:00",
+    "workshop": "Multi-Agent Robotic Systems (SCI-MARS)",
+    "title": "Panel discussion",
+    "speaker": "All invited speakers",
+    "affiliation": "—",
+    "why": "Multi-agent + collaboration consolidation.",
+    "format": "Workshop panel",
+    "url": "https://mars-eai.github.io/ICRA-SCI-MARS-Webpage/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "16:35-17:15",
+    "workshop": "Robots Meet Prior Maps",
+    "title": "Panel: Academia and Industry on prior-map-aided autonomy",
+    "speaker": "Mixed panelists",
+    "affiliation": "—",
+    "why": "How priors flow into industry-grade planning stacks.",
+    "format": "Workshop panel",
+    "url": "https://sites.google.com/view/icra2026-priors-map-workshop/home",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "16:35-17:20",
+    "workshop": "Semantics for Reliable Robot Autonomy",
+    "title": "Theme B Panel: Safe Interaction in Physical Environments",
+    "speaker": "Theme B speakers",
+    "affiliation": "—",
+    "why": "Bullseye TC discussion: how to map semantic understanding into planner/controller constraints and objectives.",
+    "format": "Workshop panel",
+    "url": "https://www.dynsyslab.org/icra2026-workshop-on-semantics-for-reliable-robot-autonomy/",
+    "relevance": "core"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "16:40-17:10",
+    "workshop": "Field Robotics",
+    "title": "Invited talk: Towards Agricultural Robots with Humans in and on the Loop",
+    "speaker": "Katie Driggs-Campbell",
+    "affiliation": "University of Illinois",
+    "why": "Shared-autonomy planning/control with humans on the loop.",
+    "format": "Workshop invited talk",
+    "url": "https://norlab-ulaval.github.io/icra_workshop_field_robotics/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "16:45-17:15",
+    "workshop": "VLA Pipelines for Real Robots",
+    "title": "Invited talk",
+    "speaker": "Karl Pertsch",
+    "affiliation": "Physical Intelligence",
+    "why": "OpenVLA / OpenX foundation policies — direct TC for the learned-control end.",
+    "format": "Workshop invited talk",
+    "url": "https://icra2026vlapipeline.github.io/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "17:00-17:30",
+    "workshop": "Manipulation Robustness",
+    "title": "Panel: Principles and Pathways to Human-Level Robustness",
+    "speaker": "All invited speakers",
+    "affiliation": "—",
+    "why": "Direct TC content: control, planning under uncertainty, hybrid model + learning robustness.",
+    "format": "Workshop panel",
+    "url": "https://manipulation-robustness.github.io/icra2026/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "Slot TBA",
+    "workshop": "Xplore: Cross-Disciplinary Exploration",
+    "title": "Invited talk",
+    "speaker": "Steve LaValle",
+    "affiliation": "University of Oulu",
+    "why": "Sampling-based motion planning legend; foundational TC voice.",
+    "format": "Workshop invited talk",
+    "url": "https://xplore-workshop.github.io/",
+    "relevance": "core"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "Slot TBA",
+    "workshop": "Xplore: Cross-Disciplinary Exploration",
+    "title": "Invited talk",
+    "speaker": "Jen Jen Chung",
+    "affiliation": "University of Queensland",
+    "why": "Informative-path-planning and exploration for autonomous robots.",
+    "format": "Workshop invited talk",
+    "url": "https://xplore-workshop.github.io/",
+    "relevance": "core"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "Slot TBA",
+    "workshop": "Xplore: Cross-Disciplinary Exploration",
+    "title": "Invited talk",
+    "speaker": "Peter Auer",
+    "affiliation": "Montanuniversität Leoben",
+    "why": "Bandit theory — formal foundations of exploration-exploitation.",
+    "format": "Workshop invited talk",
+    "url": "https://xplore-workshop.github.io/",
+    "relevance": "core"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "Slot TBA",
+    "workshop": "Xplore: Cross-Disciplinary Exploration",
+    "title": "Invited talk",
+    "speaker": "Hermann Blum",
+    "affiliation": "University of Bonn",
+    "why": "Open-world exploration in robotics under uncertainty.",
+    "format": "Workshop invited talk",
+    "url": "https://xplore-workshop.github.io/",
+    "relevance": "core"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "Slot TBA",
+    "workshop": "Xplore: Cross-Disciplinary Exploration",
+    "title": "Invited talk",
+    "speaker": "Antonin Raffin",
+    "affiliation": "DLR",
+    "why": "Maintainer of Stable-Baselines3; practical RL for control.",
+    "format": "Workshop invited talk",
+    "url": "https://xplore-workshop.github.io/",
+    "relevance": "core"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "Slot TBA",
+    "workshop": "Xplore: Cross-Disciplinary Exploration",
+    "title": "Invited talk",
+    "speaker": "Bakir Lacevic",
+    "affiliation": "University of Sarajevo",
+    "why": "Sampling-based motion planning and exploration in configuration space.",
+    "format": "Workshop invited talk",
+    "url": "https://xplore-workshop.github.io/",
+    "relevance": "core"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "Slot TBA",
+    "workshop": "Xplore: Cross-Disciplinary Exploration",
+    "title": "Invited talk",
+    "speaker": "Jens Kober",
+    "affiliation": "University of Stuttgart",
+    "why": "Robot learning + RL for skill acquisition.",
+    "format": "Workshop invited talk",
+    "url": "https://xplore-workshop.github.io/",
+    "relevance": "core"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "time": "Slot TBA",
+    "workshop": "Xplore: Cross-Disciplinary Exploration",
+    "title": "Invited talk",
+    "speaker": "Sebastian Tschiatschek",
+    "affiliation": "University of Vienna",
+    "why": "Bayesian / submodular methods for exploration in sequential decision-making.",
+    "format": "Workshop invited talk",
+    "url": "https://xplore-workshop.github.io/",
+    "relevance": "core"
+  }
+];
+
+const WORKSHOPS = [
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "type": "Tutorial",
+    "format_": "Full day",
+    "session": "09:00-17:30",
+    "title": "Riemann and Gauss meet Asimov: 3rd Tutorial on Geometric Methods in Robot Learning, Optimization and Control",
+    "relevance_text": "Core. Geometric/Riemannian foundations directly underpin motion planning, trajectory optimization, and control on Lie groups (SE(3), SO(3), manifolds of stiffness/inertia).",
+    "about": "Tutorial on differential geometry tools (Lie groups, Riemannian manifolds) applied to robot learning, optimization, and control. Aimed at researchers wanting to integrate geometry-aware methods for better data efficiency and stability guarantees.",
+    "key_points": "Best practices for geometry-aware optimization and control; Riemannian methods for trajectory and policy optimization; structure-preserving learning on manifolds; how geometry yields data efficiency and stability guarantees in control.",
+    "speakers": "Noémie Jaquier (KTH), Leonel Rozo (IIT), Søren Hauberg (DTU), Hans-Peter Schröcker (Innsbruck), Andras Kupcsik (Bosch); invited: Dian Wang (Stanford), Ross Hatton (Oregon State).",
+    "url": "https://sites.google.com/view/icra-2026-tutorial-geometry/",
+    "relevance": "core"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "type": "Tutorial",
+    "format_": "Half day",
+    "session": "Afternoon",
+    "title": "Digital Twins for UAV Autonomy: From Model-Based Design to Verified Deployment",
+    "relevance_text": "Adjacent. Model-based design, verification, and deployment of control stacks on UAVs; relevant for members working on MPC/control synthesis for aerial systems.",
+    "about": "MathWorks-led tutorial on the model-based design pipeline for UAVs: building digital twins, verifying control stacks, and deploying to hardware.",
+    "key_points": "Model-based control synthesis workflows for UAVs; verification and validation of controllers before deployment; how digital-twin pipelines integrate with classical control design.",
+    "speakers": "MathWorks engineering staff (specific speakers TBA).",
+    "url": "https://www.mathworks.com/company/events/tradeshows/icra-2026-5136850.html",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "type": "Workshop",
+    "format_": "Full day",
+    "session": "09:00-17:30",
+    "title": "Workshop on Frontiers of Optimization for Robotics, 2nd Edition",
+    "relevance_text": "Bullseye. Probably the single most TC-aligned workshop of the conference. Covers MPC, trajectory optimization, non-convex optimization, learning-based + model-based control.",
+    "about": "Brings together optimization researchers across robotics subfields. Three goals: cross-pollinate ideas across application areas, chart future directions for optimization in robotics, and foster a community around shared open-source software.",
+    "key_points": "Latest advances in MPC, trajectory optimization, and contact-implicit/non-convex optimization for robotics; how learning-based methods are becoming competitive with classical model-based approaches; combining model-based + learning to capitalize on combined strengths; widely-used open-source optimization software in robotics; mentorship program at coffee breaks.",
+    "speakers": "Evangelos Theodorou (Georgia Tech), Melanie Zeilinger (ETH), Justin Carpentier (INRIA), Michael Posa (UPenn), Toshiyuki Ohtsuka (Kyoto), Kaoru Yamamoto (Kyushu), Farbod Farshidian (RAI Institute), Moritz Diehl (Freiburg), Heng Yang (Harvard), Tobia Marcucci (UCSB).",
+    "url": "https://sites.google.com/robotics.utias.utoronto.ca/icra26-frontiers-optimization/home",
+    "relevance": "bullseye"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "type": "Workshop",
+    "format_": "Full day",
+    "session": "09:00-17:30",
+    "title": "Workshop on the Path Towards Generalizable Contact-Rich Robotics: Control and Representation (CR2)",
+    "relevance_text": "Bullseye. Hybrid/contact-rich planning and control is one of the hardest open problems for the TC. Heavy emphasis on algorithms.",
+    "about": "Three structured panel debates on contact representations, contact-rich control algorithms, and the future of contact-rich control. Strong emphasis on speculative, in-progress work; no published-paper rehearses.",
+    "key_points": "Panel 1: contact model representations (rigid vs compliant, learned vs analytical, GPU-accelerated contact, differentiable contact). Panel 2: algorithms for contact-rich control (sampling, differentiable simulation, non-convex optimization, contact-implicit MPC, zeroth- vs first-order methods, contact mode discovery). Panel 3: state and future of the field. Spotlight talks include contact-implicit MPC, distributionally robust control via Stein variational inference, branch-rejoining trajectory optimization under contact-timing uncertainty, components-of-contact analysis, complementarity-by-construction Lie-group QP solvers, predictive safety filters for quadruped locomotion.",
+    "speakers": "Panelists: Aaron Ames (Caltech), Aaron Johnson (CMU), Dmitry Berenson (Michigan), Emo Todorov (UW), Hae-Won Park (KAIST), Justin Carpentier (INRIA), Marc Toussaint (TU Berlin), Matthew Mason (CMU), Nima Fazeli (Michigan), Yilun Du (Harvard), Yuval Tassa (DeepMind), Bibit Bianchini (UPenn). Organizers: Michael Posa, Zachary Manchester, Preston Culbertson, Xianyi Cheng et al.",
+    "url": "https://cr2-icra.github.io",
+    "relevance": "bullseye"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "type": "Workshop",
+    "format_": "Full day",
+    "session": "09:00-17:00",
+    "title": "Workshop on Reinforcement Learning in the Era of Imitation Learning (RL4IL)",
+    "relevance_text": "Core. RL and policy synthesis for control are central to the TC; this workshop tackles how RL complements imitation learning for real-world robot policies.",
+    "about": "How can RL improve real-world robot policies, especially when complementing IL? Topics: efficient fine-tuning of pretrained policies, uncertainty-aware and human-in-the-loop adaptation, real-to-sim digital twins for continuous improvement, benchmarks for real-world evaluation.",
+    "key_points": "RL fine-tuning of pretrained/IL policies; reward and preference learning; offline-to-online RL with self-recovery; behavior-cloning-of-MPC; controller-gain effects on policy learning; hybrid skill policies; sample-efficient real-world dexterous fine-tuning; real2sim for continual policy improvement; Q-value extraction from BC for on-robot RL.",
+    "speakers": "Sergey Levine (Berkeley/Physical Intelligence), Chelsea Finn (Stanford/PI), Pulkit Agrawal (MIT), Robert Platt (Northeastern), Jason Ma (Dyna Robotics), Georgia Chalvatzaki (TU Darmstadt), David Held (CMU).",
+    "url": "https://rl4il-icra.github.io/",
+    "relevance": "core"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "type": "Workshop",
+    "format_": "Full day",
+    "session": "09:00-17:30",
+    "title": "Generative Digital Twins for Real2Sim and Sim2Real Transfer in Robotics",
+    "relevance_text": "Adjacent. Real2Sim and Sim2Real underpin learning-based control deployment; relevant for TC members working on policy training for control.",
+    "about": "AI-driven generation and adaptation of digital twins to bridge sim-to-real and real-to-sim gaps for robot policy training and control.",
+    "key_points": "Real2Sim pipelines that automatically construct digital twins from RGB-D / video / demonstrations; Sim2Real transfer methods leveraging adaptive twins for policy learning, control, and planning; hybrid physics-based and generative models to reduce dynamics, sensing, and appearance gaps; safety, robustness, monitoring, and uncertainty modeling with digital twins in closed-loop operation.",
+    "speakers": "Hengshuang Zhao (HKU), Jiajun Wu (Stanford), Ajay Mandlekar (NVIDIA), Manolis Savva (SFU), Ingmar Posner (Oxford), Ken Goldberg (Berkeley), Oier Mees (Microsoft), Steve Xie (Lightwheel).",
+    "url": "https://awesomedigitaltwin.github.io/2026_ICRA.html",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "type": "Workshop",
+    "format_": "Full day",
+    "session": "09:00-17:30",
+    "title": "Dexterity with Multifingered Hands: Hardware, Sensing, and Skills",
+    "relevance_text": "Adjacent. Strong subsection on the synergy of learning, planning, and control for high-DoF manipulation; some panels are squarely planning/control.",
+    "about": "How to overcome the gap between multi-fingered hands and grippers in real applications. Themes span manipulation bottlenecks, algorithms, adaptability, and hardware/sensing.",
+    "key_points": "Synergy of learning, planning, and control: balance between model-free RL and hybrid approaches; scaling planning and optimization to high-DoF systems; dynamic and forceful manipulation requiring high-frequency control; learning-based policies handling high-speed physical interactions; safe compliance during forceful interactions.",
+    "speakers": "Pulkit Agrawal (MIT), Rika Antonova (Cambridge), Jeannette Bohg (Stanford), Georgia Chalvatzaki (TU Darmstadt), Matei Ciocarlie (Columbia), Robert Katzschmann (ETH), Nathan Lepora (Bristol), Jie Song (HKUST), Maria Bauza (Google DeepMind).",
+    "url": "https://dex-manipulation.github.io/icra2026/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "type": "Workshop",
+    "format_": "Full day",
+    "session": "09:00-17:30",
+    "title": "Synthetic Data for Robot Learning",
+    "relevance_text": "Adjacent. Synthetic data underpins learned controllers and RL pipelines; relevant for TC members on the learning-for-control end.",
+    "about": "Use of synthetic data as a catalyst for robotic learning across RL, system identification, evaluation, and reasoning. Bridges control, machine learning, and computer graphics.",
+    "key_points": "Synthetic data for system identification and RL pipelines; domain transfer and realism tradeoffs; alignment with real-world deployment; applications to manipulation and legged locomotion control.",
+    "speakers": "Justin Carpentier (INRIA), Ming Lin (Maryland/Amazon), Jiajun Wu (Stanford), Sergey Zakharov (TRI), Angela Schoellig (TUM), Jason Peng (SFU/NVIDIA), Mansur Arief (Stanford), Hugo Talbot (INRIA), Maurizio Chiaramonte (Meta).",
+    "url": "https://sites.google.com/view/icra-2026-sdrl-workshop",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "type": "Workshop",
+    "format_": "Half day",
+    "session": "Afternoon (14:00-17:45)",
+    "title": "1st Workshop on Generalization in Autonomous Driving: Paradigms, Practice, and Public Road Demonstrations",
+    "relevance_text": "Adjacent. Decision-making and planning under generalization pressure for AVs; especially relevant if you work on motion planning for self-driving.",
+    "about": "Confronts modular open-source vs end-to-end learning paradigms for AV generalization. Includes a live livestreamed demonstration of the TUM EDGAR autonomous vehicle on public roads in Munich.",
+    "key_points": "Modular vs end-to-end vs hybrid AV stacks; domain adaptation, sim-to-real transfer, self-supervised and continual learning; evaluation benchmarks; software engineering for AV control; live public-road demonstration.",
+    "speakers": "Marco Pavone (Stanford/NVIDIA), Cristina Olaverri-Monreal (JKU Linz), Felix Fent (TUM), Hongyang Li (HKU), Kashyap Chitta (NVIDIA).",
+    "url": "https://tum-avs.github.io/ICRA2026_Workshop/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Monday",
+    "date": "2026-06-01",
+    "type": "Workshop",
+    "format_": "Half day",
+    "session": "Afternoon (14:00-17:30)",
+    "title": "Workshop on Pedestrian Behavior Prediction",
+    "relevance_text": "Adjacent. Prediction directly feeds motion planning under uncertainty in human-populated environments.",
+    "about": "Pedestrian behavior prediction in factories, hospitals, malls, and traffic scenes, with focus on multi-modal dependencies, real-time requirements, and uncertain pedestrian intentions.",
+    "key_points": "Multi-modal forecasting (multiple plausible futures); uncertainty-aware / probabilistic prediction (aleatoric & epistemic); real-time prediction systems for deployment; predictive planning and control; pedestrian-vehicle and pedestrian-robot interaction modeling.",
+    "speakers": "Alexandre Alahi (EPFL), Hubert Shum (Durham), Amir Rasouli (Huawei Noah's Ark), Philippe Martinet (Inria Sophia Antipolis).",
+    "url": "https://workshop-pbp2026.github.io/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "type": "Workshop",
+    "format_": "Full day",
+    "session": "09:00-17:15",
+    "title": "Geometry in the Age of Data-Driven Robotics",
+    "relevance_text": "Bullseye. Direct debate format on whether/how geometry still matters for planning, control, and decision-making in the era of learning. Explicitly addresses TC's foundational tools.",
+    "about": "Three structured pro/contra panel debates (Education, Research, Communication) examining the evolving role of differential geometry, Lie groups, topology, screw theory, and dual quaternions in modern robotics.",
+    "key_points": "Tensions and synergies between classical geometry and learning-centric paradigms across kinematics, dynamics, and control; whether differential geometry should remain priority in education; whether the interesting research questions on geometry are 'already answered'; how to communicate geometric methods in an AI-headlines world; spotlight talks from junior researchers on geometric/hybrid methods.",
+    "speakers": "Noémie Jaquier (KTH), Frank Park (SNU), Andreas Müller (JKU), Stefano Stramigioli (Twente), Patrick Wensing (Notre Dame), Ross Hatton (Oregon State), Antonio Franchi (Sapienza/Twente), Georgia Chalvatzaki (TU Darmstadt), Zachary Manchester (MIT), Bruno Adorno (Manchester), Seth Hutchinson (Northeastern), Nadia Figueroa (UPenn).",
+    "url": "https://geometric-robotics.github.io/icra-2026-workshop/",
+    "relevance": "bullseye"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "type": "Workshop",
+    "format_": "Full day",
+    "session": "09:00-17:30",
+    "title": "Uncertainty in Open-World Robotics",
+    "relevance_text": "Core. Decision-making and control under uncertainty is a central TC theme.",
+    "about": "Leveraging uncertainty to enable safer, more adaptable robotic systems in dynamic real-world environments. Emphasizes practical, deployable methods rather than purely theoretical treatments.",
+    "key_points": "Uncertainty-aware control handling sensor noise, disturbances, and modeling errors; how uncertainty estimates guide exploration and traversability assessment; quantifying epistemic/aleatoric uncertainty for navigation; using confidence to know when robots should say 'I don't know'; cost of ignoring uncertainty in control loops.",
+    "speakers": "Nicholas Roy (MIT), Baoru Huang (Liverpool), Abhinav Valada (Freiburg), Marija Popovic (TU Delft), Siyuan Huang (UniTree, BIGAI).",
+    "url": "https://uncertainty-in-robotics.github.io/",
+    "relevance": "core"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "type": "Workshop",
+    "format_": "Full day",
+    "session": "09:00-17:30",
+    "title": "Xplore: Cross-Disciplinary aspects of Exploration in Robotics, Reinforcement Learning, and Search",
+    "relevance_text": "Core. Exploration, search, and planning under uncertainty are core TC topics; this workshop unifies them across communities.",
+    "about": "Bridges RL, search-algorithm, and robotics communities around exploration as a unifying challenge in sequential decision-making and planning.",
+    "key_points": "Formalizing a unifying framework for exploration spanning RL, search, and autonomous robotics; exploration-exploitation balance under safety, resource, and horizon constraints; safe, reset-free, physically grounded exploration; LLM- and curiosity-guided exploration in open-ended environments; horizon-aware exploration and planning for exploration; meta-learning and learning-to-explore.",
+    "speakers": "Steve LaValle (Oulu), Jen Jen Chung (Queensland), Peter Auer (Montanuniversität Leoben), Hermann Blum (Bonn), Antonin Raffin (DLR), Bakir Lacevic (Sarajevo), Jens Kober (Stuttgart), Sebastian Tschiatschek (Vienna).",
+    "url": "https://xplore-workshop.github.io/",
+    "relevance": "core"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "type": "Workshop",
+    "format_": "Full day",
+    "session": "08:50-17:30",
+    "title": "Semantics for Reliable Robot Autonomy: From Environment Understanding and Reasoning to Safe Interaction",
+    "relevance_text": "Core. Theme B is explicitly 'Safe Interaction in Physical Environments': mapping high-level/semantic understanding into constraints/objectives compatible with planning and control-theoretic frameworks. Co-organized by Angela Schoellig (Dynamic Systems Lab) and Somil Bansal (Stanford).",
+    "about": "How semantic understanding feeds reliable autonomy and safe interaction. Two themes: (A) Environment perception and contextual reasoning, (B) Safe interaction in physical environments.",
+    "key_points": "Mapping semantic/high-level understanding into constraints and objectives compatible with planning and control-theoretic frameworks; safe motion planning and control under semantic uncertainties; whether language is sufficient as a grounding medium for safety; how to handle uncertainty and hallucination in large-scale models within control loops; jailbreaking attacks and defenses for LLM-enabled robots; semantic execution monitoring.",
+    "speakers": "Marco Pavone (Stanford/NVIDIA), Angel Chang (SFU), Lukas Schmid (MIT), Janet Wiles (Queensland), Karol Hausman (Physical Intelligence), George Pappas (UPenn), Mengdi Xu (Tsinghua), Ken Goldberg (Berkeley), Dongheui Lee (TU Wien/DLR). Organizers: Angela Schoellig, Somil Bansal, SiQi Zhou, Oier Mees, Lukas Brunke.",
+    "url": "https://www.dynsyslab.org/icra2026-workshop-on-semantics-for-reliable-robot-autonomy/",
+    "relevance": "core"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "type": "Workshop",
+    "format_": "Full day",
+    "session": "09:00-17:30",
+    "title": "8th Workshop on Long-term Human Motion Prediction (LHMP)",
+    "relevance_text": "Core. Prediction directly drives planning around humans; this is the eighth iteration with a long-running TC-adjacent community.",
+    "about": "Long-term prediction of human trajectories, body poses, actions, and activities for service robots, autonomous vehicles, collaborative manipulators, and tracking.",
+    "key_points": "Predictive planning and control around humans; uncertainty propagation from prediction inputs to outputs; motion and task planning in dynamic environments considering motion predictions; multi-modal foundation-model integration for prediction; benchmarks, datasets, and evaluation protocols.",
+    "speakers": "Katherine Driggs-Campbell (Illinois), Dana Kulic (Monash), Jean Oh (CMU), Lukas Schmid (UTN), Kashyap Chitta (NVIDIA), Johannes Betz (TUM), Tim Pfeifer (Siemens), David Woollard (Standard AI), Alessandro Corbetta (TU/e).",
+    "url": "https://motionpredictionicra2026.github.io/",
+    "relevance": "core"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "type": "Workshop",
+    "format_": "Full day",
+    "session": "08:30-16:30",
+    "title": "AI-Driven Safe Aerial Robotics",
+    "relevance_text": "Adjacent. Safe perception, control, and decision-making for UAVs; explicitly covers MPC for agile flight and verifiable, robust control.",
+    "about": "How AI paradigms, bio-inspired approaches, and novel aerial designs can deliver safe, resilient, trustworthy aerial robotics. Special emphasis on verifiability, robustness, and ethics/regulation.",
+    "key_points": "Aggressive acrobatics in insect-scale aerial robots via deep-learned MPC (Kevin Chen, MIT); reliable visual navigation 'anytime, anywhere' (Elia Kaufmann, Skydio); collision avoidance for aerial vehicles (Nora Ayanian, Brown); embodied AI on tiny robots (Daniele Palossi, SUPSI); de-risking autonomy for safe deployment (Fabrizio Schiano, Leonardo); large-scale drone swarm coordination (Hyun Lim, UViFy); bio-inspired AI for inherently safe lightweight flying robots (Guido de Croon, TU Delft).",
+    "speakers": "Vijay Kumar (UPenn), Elia Kaufmann (Skydio), Nora Ayanian (Brown), Daniele Palossi (SUPSI), Kevin Chen (MIT), Robert Katzschmann (ETH), Guido de Croon (TU Delft), Sophie Armanini (Imperial), Pakpong Chirarattananon (Toronto), Fabrizio Schiano (Leonardo).",
+    "url": "https://aerial-robotics-workshop-icra.com/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "type": "Workshop",
+    "format_": "Full day",
+    "session": "09:00-17:15",
+    "title": "Scaling Compositional Intelligence for Multi-Agent Robotic Systems",
+    "relevance_text": "Adjacent. Multi-agent planning, coordination, and control of robot teams.",
+    "about": "Multi-agent robotic systems for real-world collaboration: warehouses, construction, households, healthcare. Bridges sim-based research and practical deployment.",
+    "key_points": "Multi-robot coordination for navigation, manipulation, assembly, logistics; communication and coordination protocols for heterogeneous teams; learning-based (RL, IL) approaches for real-world multi-agent coordination; safety, trust, and transparency in human-multi-robot interaction; sim-to-real transfer for multi-agent systems.",
+    "speakers": "Chelsea Finn (Stanford), Marco Pavone (Stanford), Yao Mu (HKU), Yinghao Xu (Stanford), Xu Liu (Stanford), Eugene Vinitsky (NYU). Advisory: Sergey Levine (Berkeley), Mac Schwager (Stanford), Pieter Abbeel (Berkeley), Josh Tenenbaum (MIT).",
+    "url": "https://mars-eai.github.io/ICRA-SCI-MARS-Webpage/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "type": "Workshop",
+    "format_": "Half day",
+    "session": "Afternoon (14:00-17:40)",
+    "title": "Workshop on Manipulation Robustness: Towards Human-Level Robustness under Real-World Challenges",
+    "relevance_text": "Adjacent. Explicit Control for Robust Manipulation and Planning under Uncertainty themes squarely in TC scope.",
+    "about": "How to achieve manipulation robustness comparable to humans and animals across planning, control, perception, learning, and hardware.",
+    "key_points": "Robust and adaptive control methods handling unstructured disturbances; role of compliance, variable stiffness, and hybrid control; planning under uncertainty in cluttered, contact-rich environments; integrating planning and learning to balance robustness and efficiency; common robustness principles across manipulation, locomotion, and navigation.",
+    "speakers": "Andrea Bajcsy (CMU), Haozhi Qi (UChicago/Amazon FAR), Jan Peters (TU Darmstadt), Jie Song (HKUST-GZ), Josie Hughes (EPFL), Oliver Brock (TU Berlin), Shuran Song (Stanford).",
+    "url": "https://manipulation-robustness.github.io/icra2026/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "type": "Workshop",
+    "format_": "Full day",
+    "session": "09:00-17:30",
+    "title": "Beyond Teleoperation: Learning from Diverse Human and Simulation Data",
+    "relevance_text": "Adjacent. How learned manipulation policies (an emerging control paradigm) ingest diverse data sources.",
+    "about": "Methods that go beyond teleoperation to learn dexterous manipulation skills from in-the-wild human video and simulation, addressing embodiment mismatch and sim-to-real gaps.",
+    "key_points": "Learning dexterous manipulation skills from human demonstrations beyond teleoperation; world models grounded in real-world physics from in-the-wild video; using small high-quality teleop data as an anchor alongside large-scale off-domain sources; sim-to-real and embodiment-gap bridging for transferable skills.",
+    "speakers": "Jitendra Malik (Berkeley), Edward Johns (Imperial), Danfei Xu (Georgia Tech), Karen Liu (Stanford), Katerina Fragkiadaki (CMU), Yue Wang (USC), Roberto Martín-Martín (UT Austin).",
+    "url": "https://icra-beyond-teleop.github.io/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "type": "Workshop",
+    "format_": "Full day",
+    "session": "09:00-17:30",
+    "title": "From Data to Decisions: VLA Pipelines for Real Robots",
+    "relevance_text": "Adjacent. VLA (vision-language-action) models are an emerging control paradigm; relevant for TC members tracking learned policies.",
+    "about": "End-to-end VLA pipelines, from data collection and curation to training, inference, and evaluation, with focus on real-world deployment and safety.",
+    "key_points": "Best practices and shared metrics for VLA generalization and safety; inference-time decision-making and reasoning; safety, robustness, and generalization analysis of learned policies; Mobile Manipulation Challenge competition with real-robot evaluation on Toyota HSR.",
+    "speakers": "Karl Pertsch (Physical Intelligence), Shuran Song (Stanford), Alberto Rodriguez (Boston Dynamics), Yuke Zhu (NVIDIA/UT Austin), Tetsuya Ogata (Waseda), Katherine Liu (TRI), Masha Itkina (TRI).",
+    "url": "https://icra2026vlapipeline.github.io/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "type": "Workshop",
+    "format_": "Full day",
+    "session": "08:30-17:30",
+    "title": "Field Robotics",
+    "relevance_text": "Adjacent. Field deployment of planning and control stacks; relevant if your work targets real-world outdoor autonomy.",
+    "about": "Developing, deploying, and evaluating autonomous mobile systems in unstructured outdoor environments: agriculture, construction, mining, forestry, marine, planetary.",
+    "key_points": "Field-deployable maritime autonomy through energy-aware planning, docking, and coordination (Nina Mahmoudian); scaling field robotics in the age of LLMs (Nicholas Roy); LiDAR-centric navigation for field drones (Fu Zhang); agricultural robots with humans in/on the loop (Katie Driggs-Campbell). Deployment lessons from real outdoor sites.",
+    "speakers": "Nicholas Roy (MIT), Stefan Williams (Sydney), Cédric Pradalier (Georgia Tech Europe), Nina Mahmoudian (Purdue), Fu Zhang (HKU), Katie Driggs-Campbell (Illinois). Organizers include Marco Hutter (ETH).",
+    "url": "https://norlab-ulaval.github.io/icra_workshop_field_robotics/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "type": "Workshop",
+    "format_": "Full day",
+    "session": "08:30-17:30",
+    "title": "Workshop on Intelligent Space Robotics and Systems",
+    "relevance_text": "Adjacent. Autonomy, GNC, and motion planning under tight constraints; especially relevant if your work touches space, on-orbit servicing, or planetary rovers.",
+    "about": "Off-world autonomy: on-orbit servicing, planetary exploration, lunar activities, resource prospecting, remote sensing.",
+    "key_points": "Estimation, localization, and navigation algorithms for space; new simulation tools, foundation models, and scene representations for space autonomy; unique constraints (data scarcity, onboard compute, edge cases) shaping algorithm design; perception, manipulation, locomotion, mapping, and navigation for space robots.",
+    "speakers": "Christian Ott (TU Wien), Dongheui Lee (TU Wien), Carlos Pérez del Pulgar (Málaga), Genya Ishigami (Keio), Giusy Falcone (Michigan), Kuldeep Barad (Redwire). Organizers include Hiro Ono (NASA JPL), Abhishek Cauligi (JHU), Keenan Albee (USC).",
+    "url": "https://space-robotics-workshop.github.io/icra2026/",
+    "relevance": "adjacent"
+  },
+  {
+    "day": "Friday",
+    "date": "2026-06-05",
+    "type": "Workshop",
+    "format_": "Full day",
+    "session": "09:00-17:30",
+    "title": "Robots Meet Prior Maps: Leveraging Geometric and Semantic Priors for Real-World Robot Autonomy",
+    "relevance_text": "Adjacent. Map-aware planning and navigation; how priors (BIM, floor plans, remote sensing) feed planning/control pipelines.",
+    "about": "Effectively leveraging heterogeneous, often incomplete prior maps (BIM, floor plans, venue maps, remote sensing, CT) for robot perception, navigation, and manipulation.",
+    "key_points": "Which priors are essential for which tasks; how to extract usable priors from heterogeneous maps; integration of priors with planning and manipulation; CPMs for collaborative robotics and automated systems.",
+    "speakers": "David Hsu (NUS), Abhinav Valada (Freiburg), Jen Jen Chung (Queensland), Jose-Luis Sanchez-Lopez (Luxembourg), Ji Zhang (CMU, virtual), Xiaolong Wang (UCSD), Javier Civera (Zaragoza), Luca Carlone (MIT, tentative).",
+    "url": "https://sites.google.com/view/icra2026-priors-map-workshop/home",
+    "relevance": "adjacent"
+  }
+];
+
+// ============================================================================
+// RENDERING
+// ============================================================================
+
+const RELEVANCE_ORDER = { "bullseye": 0, "core": 1, "adjacent": 2 };
+
+function timeStartMinutes(t) {
+  // "09:30-10:00" -> 9*60+30 = 570
+  const m = t.match(/(\d{1,2}):(\d{2})/);
+  if (!m) return 9999;
+  return parseInt(m[1])*60 + parseInt(m[2]);
+}
+
+function groupByTime(sessions) {
+  const map = new Map();
+  for (const s of sessions) {
+    const key = s.time;
+    if (!map.has(key)) map.set(key, []);
+    map.get(key).push(s);
+  }
+  // Sort within slot by relevance then workshop
+  for (const arr of map.values()) {
+    arr.sort((a,b) => RELEVANCE_ORDER[a.relevance] - RELEVANCE_ORDER[b.relevance] || a.workshop.localeCompare(b.workshop));
+  }
+  // Return as sorted array of [time, sessions] entries
+  return [...map.entries()].sort((a,b) => timeStartMinutes(a[0]) - timeStartMinutes(b[0]));
+}
+
+function renderTimeline(day, filterRel, search) {
+  const container = document.getElementById(`timeline-${day.toLowerCase()}`);
+  const countEl = document.getElementById(`count-${day.toLowerCase()}`);
+
+  let filtered = SESSIONS.filter(s => s.day === day);
+  if (filterRel !== "all") filtered = filtered.filter(s => s.relevance === filterRel);
+  if (search) {
+    const q = search.toLowerCase();
+    filtered = filtered.filter(s =>
+      (s.title + " " + s.speaker + " " + s.workshop + " " + s.why + " " + s.affiliation).toLowerCase().includes(q)
+    );
+  }
+
+  countEl.textContent = `${filtered.length} session${filtered.length === 1 ? '' : 's'}`;
+
+  if (filtered.length === 0) {
+    container.innerHTML = `<div class="empty">No sessions match these filters.</div>`;
+    return;
+  }
+
+  const grouped = groupByTime(filtered);
+  let html = '';
+  for (const [time, items] of grouped) {
+    html += `<div class="timeslot">`;
+    html += `<div class="time">${escapeHtml(time)}`;
+    if (items.length > 1) html += `<span class="duration">${items.length} parallel</span>`;
+    html += `</div>`;
+    html += `<div class="talks">`;
+    for (const s of items) {
+      html += renderTalkCard(s);
+    }
+    html += `</div></div>`;
+  }
+  container.innerHTML = html;
+
+  // Wire up expand toggles
+  container.querySelectorAll('.talk-card').forEach(card => {
+    card.addEventListener('click', (e) => {
+      if (e.target.tagName === 'A') return;
+      card.classList.toggle('expanded');
+      const t = card.querySelector('.expand-toggle');
+      if (t) t.textContent = card.classList.contains('expanded') ? '— less' : '+ more';
+    });
+  });
+}
+
+function renderTalkCard(s) {
+  const speakerHtml = s.speaker && s.speaker !== '—'
+    ? `<div class="speaker"><span class="name">${escapeHtml(s.speaker)}</span>${s.affiliation && s.affiliation !== '—' ? ' <span class="aff">· ' + escapeHtml(s.affiliation) + '</span>' : ''}</div>`
+    : '';
+  return `
+    <div class="talk-card ${s.relevance}">
+      <div class="workshop-tag"><span class="relevance-dot"></span>${escapeHtml(s.workshop)} · ${escapeHtml(s.format)}</div>
+      <div class="talk-title">${escapeHtml(s.title)}</div>
+      ${speakerHtml}
+      <div class="why">${escapeHtml(s.why)}</div>
+      <div class="more">
+        <span class="expand-toggle">+ more</span>
+        <a href="${escapeAttr(s.url)}" target="_blank" rel="noopener">workshop site ↗</a>
+      </div>
+    </div>
+  `;
+}
+
+function renderWorkshops(filterRel, filterDay, search) {
+  const container = document.getElementById('grid-workshops');
+  const countEl = document.getElementById('count-workshops');
+
+  let filtered = [...WORKSHOPS];
+  if (filterRel !== "all") filtered = filtered.filter(w => w.relevance === filterRel);
+  if (filterDay !== "all") filtered = filtered.filter(w => w.day === filterDay);
+  if (search) {
+    const q = search.toLowerCase();
+    filtered = filtered.filter(w =>
+      (w.title + " " + w.about + " " + w.key_points + " " + w.speakers).toLowerCase().includes(q)
+    );
+  }
+
+  // Sort: relevance, then day, then title
+  filtered.sort((a,b) =>
+    RELEVANCE_ORDER[a.relevance] - RELEVANCE_ORDER[b.relevance]
+    || (a.day === "Monday" ? -1 : 1) - (b.day === "Monday" ? -1 : 1)
+    || a.title.localeCompare(b.title)
+  );
+
+  countEl.textContent = `${filtered.length} workshop${filtered.length === 1 ? '' : 's'}`;
+
+  if (filtered.length === 0) {
+    container.innerHTML = `<div class="empty">No workshops match these filters.</div>`;
+    return;
+  }
+
+  let html = '';
+  for (const w of filtered) {
+    const relLabel = w.relevance === "bullseye" ? "● BULLSEYE" : w.relevance === "core" ? "● CORE" : "● ADJACENT";
+    html += `
+      <div class="ws-card ${w.relevance}">
+        <div class="ws-meta">
+          <span>${escapeHtml(w.day)} · ${escapeHtml(w.format_)} · ${escapeHtml(w.session)}</span>
+          <span class="relevance-tag">${relLabel}</span>
+        </div>
+        <h3>${escapeHtml(w.title)}</h3>
+        <div class="about">${escapeHtml(w.about)}</div>
+        <div class="key-label">What to listen for</div>
+        <div class="key-points">${escapeHtml(w.key_points)}</div>
+        <div class="speakers-label">Notable speakers</div>
+        <div class="speakers">${escapeHtml(w.speakers)}</div>
+        <a class="ws-link" href="${escapeAttr(w.url)}" target="_blank" rel="noopener">workshop site</a>
+      </div>
+    `;
+  }
+  container.innerHTML = html;
+}
+
+function renderSpeakers(search) {
+  const container = document.getElementById('speaker-index');
+  const countEl = document.getElementById('count-speakers');
+
+  // Build speaker map: name -> [{ session... }]
+  const speakerMap = new Map();
+  for (const s of SESSIONS) {
+    if (!s.speaker || s.speaker === '—') continue;
+    // Skip generic "Organizers", "Selected authors", etc - keep only ones that look like a real name
+    if (/^(Organizers|Tutorial organizers|Workshop speakers|Selected authors|Various authors|Theme [AB] speakers|Invited speakers|Audience|Attendees|Mixed panelists|All invited speakers|Panel|Theme.+speakers)/i.test(s.speaker)) continue;
+    // For multi-speaker lines, split on "," / ";" / " and "
+    const names = s.speaker.split(/,| and |;/).map(x => x.trim()).filter(x => x.length > 0);
+    for (const name of names) {
+      // Strip qualifiers like "(remote)", "(chair: ...)"
+      const cleanName = name.replace(/\s*\([^)]*\)\s*$/, '').trim();
+      if (cleanName.length === 0) continue;
+      // Skip if it doesn't look like a name (e.g., starts with lowercase or is too generic)
+      if (!/^[A-Z]/.test(cleanName)) continue;
+      if (cleanName.toLowerCase().includes('chair:')) continue;
+      if (!speakerMap.has(cleanName)) speakerMap.set(cleanName, []);
+      speakerMap.get(cleanName).push(s);
+    }
+  }
+
+  let speakers = [...speakerMap.entries()];
+  if (search) {
+    const q = search.toLowerCase();
+    speakers = speakers.filter(([name]) => name.toLowerCase().includes(q));
+  }
+
+  speakers.sort((a,b) => {
+    const aLast = a[0].split(' ').slice(-1)[0];
+    const bLast = b[0].split(' ').slice(-1)[0];
+    return aLast.localeCompare(bLast);
+  });
+
+  countEl.textContent = `${speakers.length} speaker${speakers.length === 1 ? '' : 's'}`;
+
+  if (speakers.length === 0) {
+    container.innerHTML = `<div class="empty">No speakers match.</div>`;
+    return;
+  }
+
+  // Group by first letter of last name
+  const byLetter = new Map();
+  for (const [name, sessions] of speakers) {
+    const lastName = name.split(' ').slice(-1)[0];
+    const letter = lastName[0].toUpperCase();
+    if (!byLetter.has(letter)) byLetter.set(letter, []);
+    byLetter.get(letter).push([name, sessions]);
+  }
+
+  let html = '';
+  for (const [letter, entries] of [...byLetter.entries()].sort()) {
+    html += `<div class="speaker-letter"><h3>${letter}</h3>`;
+    for (const [name, sessions] of entries) {
+      html += `<div class="speaker-entry">`;
+      html += `<div class="name">${escapeHtml(name)}</div>`;
+      for (const s of sessions) {
+        html += `<div class="where">${escapeHtml(s.workshop)}</div>`;
+        html += `<div class="when">${escapeHtml(s.day)} · ${escapeHtml(s.time)}${s.title.toLowerCase().includes('invited talk') ? '' : ' · ' + escapeHtml(s.title.length > 60 ? s.title.substring(0, 60) + '…' : s.title)}</div>`;
+      }
+      html += `</div>`;
+    }
+    html += `</div>`;
+  }
+  container.innerHTML = html;
+}
+
+// ============================================================================
+// UTILITIES
+// ============================================================================
+
+function escapeHtml(s) {
+  if (s === undefined || s === null) return '';
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+function escapeAttr(s) { return escapeHtml(s); }
+
+// ============================================================================
+// STATE & EVENT WIRING
+// ============================================================================
+
+const state = {
+  monday: { rel: 'all', search: '' },
+  friday: { rel: 'all', search: '' },
+  workshops: { rel: 'all', day: 'all', search: '' },
+  speakers: { search: '' },
+};
+
+function setupTabs() {
+  document.querySelectorAll('nav.tabs button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('nav.tabs button').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      const target = btn.dataset.panel;
+      document.getElementById('panel-' + target).classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    });
+  });
+}
+
+function setupFilters(day) {
+  const group = document.getElementById(`filter-${day}`);
+  const searchInput = document.getElementById(`search-${day}`);
+
+  group.querySelectorAll('.pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      group.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      state[day].rel = pill.dataset.rel;
+      rerender();
+    });
+  });
+
+  searchInput.addEventListener('input', (e) => {
+    state[day].search = e.target.value;
+    rerender();
+  });
+}
+
+function setupWorkshopsPanel() {
+  document.getElementById('filter-workshops').querySelectorAll('.pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      document.querySelectorAll('#filter-workshops .pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      state.workshops.rel = pill.dataset.rel;
+      rerender();
+    });
+  });
+  document.getElementById('day-workshops').querySelectorAll('.pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      document.querySelectorAll('#day-workshops .pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      state.workshops.day = pill.dataset.day;
+      rerender();
+    });
+  });
+  document.getElementById('search-workshops').addEventListener('input', (e) => {
+    state.workshops.search = e.target.value;
+    rerender();
+  });
+}
+
+function setupSpeakersPanel() {
+  document.getElementById('search-speakers').addEventListener('input', (e) => {
+    state.speakers.search = e.target.value;
+    renderSpeakers(state.speakers.search);
+  });
+}
+
+function rerender() {
+  renderTimeline('Monday', state.monday.rel, state.monday.search);
+  renderTimeline('Friday', state.friday.rel, state.friday.search);
+  renderWorkshops(state.workshops.rel, state.workshops.day, state.workshops.search);
+  renderSpeakers(state.speakers.search);
+}
+
+// Boot
+setupTabs();
+setupFilters('monday');
+setupFilters('friday');
+setupWorkshopsPanel();
+setupSpeakersPanel();
+rerender();
+</script>
+</body>
+</html>
