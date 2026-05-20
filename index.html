@@ -1081,7 +1081,7 @@ function renderPaperSessionCard(s) {
   }).join('');
   return `<div class="talk-card paper-session noteworthy">
   <div class="workshop-tag"><span class="relevance-dot"></span>${escapeHtml(tag)}</div>
-  <div class="talk-title">${n} TC-relevant paper${n !== 1 ? 's' : ''}</div>
+  <div class="talk-title">${escapeHtml(s.session_code)} — ${escapeHtml(s.session_type)}</div>
   ${locationHtml}
   ${mapHtml}
   <div class="papers-list">${papersHtml}</div>
