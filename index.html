@@ -391,6 +391,31 @@
   }
   .talk-card .expand-toggle:hover { color: var(--ink-dim); }
 
+  .talk-card .map-toggle {
+    color: var(--ink-faint);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    user-select: none;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .talk-card .map-toggle:hover { color: var(--ink-dim); }
+  .talk-map {
+    display: none;
+    margin-top: 12px;
+  }
+  .talk-card.map-expanded .talk-map { display: block; }
+  .talk-map img {
+    width: 100%;
+    max-width: 480px;
+    border: 1px solid var(--rule);
+    display: block;
+  }
+
   /* ----- Workshop view ----- */
   .ws-grid {
     display: grid;
@@ -680,6 +705,15 @@ const DAYS = [
 ];
 
 // ============================================================================
+// LOCATION → MAP  (add entries here as more rooms are confirmed)
+// ============================================================================
+const LOCATION_MAPS = {
+  'Hall A1 (Plenary)':  'maps/Hall_A.png',
+  'Hall A3':            'maps/Hall_A.png',
+  'Strauss 1-2':        'maps/congress_center.png',
+};
+
+// ============================================================================
 // CSV PARSING
 // ============================================================================
 function parseCSV(text) {
@@ -920,14 +954,22 @@ function renderCard(s) {
   const locationHtml = (s.location && s.location !== 'TBA')
     ? `<div class="location">${escapeHtml(s.location)}</div>`
     : '';
-  const hasDetail = s.why || s.url;
+  const mapImg = LOCATION_MAPS[s.location];
+  const mapHtml = mapImg
+    ? `<div class="talk-map"><img src="${escapeAttr(mapImg)}" alt="Map of ${escapeAttr(s.location)}" loading="lazy"></div>`
+    : '';
+  const mapToggle = mapImg
+    ? `<button class="map-toggle" onclick="var c=this.closest('.talk-card');c.classList.toggle('map-expanded');this.textContent=c.classList.contains('map-expanded')?'map ▴':'map ▾'">map ▾</button>`
+    : '';
+  const hasDetail = s.why || s.url || mapImg;
   return `<div class="talk-card ${escapeAttr(s.relevance)}">
   <div class="workshop-tag"><span class="relevance-dot"></span>${escapeHtml(tag)}</div>
   <div class="talk-title">${escapeHtml(s.title)}</div>
   ${speakerHtml}
   ${locationHtml}
   ${s.why ? `<div class="why">${escapeHtml(s.why)}</div>` : ''}
-  ${hasDetail ? `<div class="more">${s.why ? '<span class="expand-toggle">+ more</span>' : ''}${s.url ? `<a href="${escapeAttr(s.url)}" target="_blank" rel="noopener">session page ↗</a>` : ''}</div>` : ''}
+  ${mapHtml}
+  ${hasDetail ? `<div class="more">${s.why ? '<span class="expand-toggle">+ more</span>' : ''}${mapToggle}${s.url ? `<a href="${escapeAttr(s.url)}" target="_blank" rel="noopener">session page ↗</a>` : ''}</div>` : ''}
 </div>`;
 }
 
