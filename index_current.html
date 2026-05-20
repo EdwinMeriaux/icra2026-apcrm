@@ -9,23 +9,18 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,800;1,9..144,400&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    /* Light theme — text on white */
-    --ink: #1a1614;          /* primary text — near-black with warm tint */
-    --ink-dim: #4a443e;      /* secondary text */
-    --ink-faint: #8a8275;    /* tertiary / meta text */
-    --paper: #ffffff;        /* page background */
-    --paper-raised: #faf7f2; /* cards / inputs — warm off-white */
-    --paper-elev: #f2ede4;   /* hover state */
-    --rule: #e5ddd0;         /* dividers */
-    /* ICRA 2026 palette — red primary, purple secondary */
-    --accent: #c8392c;        /* ICRA 2026 Vienna red — primary */
-    --accent-soft: #f5d5d0;   /* tinted background for red */
-    --accent-dark: #9c2a1f;   /* darker red for hover on light bg */
-    --secondary: #7d3996;     /* ICRA purple — secondary accent */
-    --secondary-dark: #5a2470;
-    --spotlight: #d4a017;     /* warm gold — slightly darker to read on white */
-    --important: #c8392c;     /* same as accent (red is the "important" color) */
-    --noteworthy: #7d3996;    /* purple for noteworthy */
+    --ink: #f5f1e8;
+    --ink-dim: #b8b0a0;
+    --ink-faint: #6e685c;
+    --paper: #15130f;
+    --paper-raised: #1f1c17;
+    --paper-elev: #2a2620;
+    --rule: #3a3530;
+    --accent: #c8392c;
+    --accent-soft: #6f2018;
+    --spotlight: #e8b842;
+    --important: #c8392c;
+    --noteworthy: #6e685c;
   }
 
   * { box-sizing: border-box; }
@@ -44,7 +39,7 @@
   /* ----- Header ----- */
   header.masthead {
     border-bottom: 1px solid var(--rule);
-    padding: 40px 32px 36px;
+    padding: 48px 32px 36px;
     max-width: 1400px;
     margin: 0 auto;
     position: relative;
@@ -56,28 +51,7 @@
     right: 32px;
     top: 0;
     height: 4px;
-    /* Purple → red gradient echoing the logo */
-    background: linear-gradient(90deg, var(--secondary) 0%, var(--secondary) 50%, var(--accent) 100%);
-  }
-  .masthead-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 32px;
-    margin-bottom: 8px;
-    flex-wrap: wrap;
-  }
-  .masthead-text { flex: 1; min-width: 280px; }
-  .logo-wrap {
-    flex-shrink: 0;
-    padding: 4px 0;
-    display: flex;
-    align-items: center;
-  }
-  .logo-wrap img {
-    display: block;
-    height: 64px;
-    width: auto;
+    background: var(--accent);
   }
   .kicker {
     font-family: 'JetBrains Mono', monospace;
@@ -235,12 +209,12 @@
   .pill:hover { color: var(--ink); border-color: var(--ink-faint); }
   .pill.active {
     background: var(--accent);
-    color: #ffffff;
+    color: var(--paper);
     border-color: var(--accent);
   }
-  .pill.spotlight.active { background: var(--spotlight); border-color: var(--spotlight); color: #ffffff; }
-  .pill.important.active { background: var(--important); border-color: var(--important); color: #ffffff; }
-  .pill.noteworthy.active { background: var(--noteworthy); border-color: var(--noteworthy); color: #ffffff; }
+  .pill.spotlight.active { background: var(--spotlight); border-color: var(--spotlight); color: #2a2206; }
+  .pill.important.active { background: var(--important); border-color: var(--important); }
+  .pill.noteworthy.active { background: var(--ink-faint); border-color: var(--ink-faint); color: var(--paper); }
 
   .results-count {
     font-family: 'JetBrains Mono', monospace;
@@ -302,11 +276,10 @@
   }
   .talk-card:hover {
     background: var(--paper-elev);
-    border-left-color: var(--ink-faint);
+    border-left-color: var(--ink-dim);
   }
   .talk-card.spotlight { border-left-color: var(--spotlight); }
   .talk-card.important { border-left-color: var(--important); }
-  .talk-card.noteworthy { border-left-color: var(--noteworthy); }
   .talk-card .workshop-tag {
     font-family: 'JetBrains Mono', monospace;
     font-size: 10px;
@@ -321,11 +294,10 @@
     border-radius: 50%;
     margin-right: 6px;
     vertical-align: 1px;
-    background: var(--ink-faint);
+    background: var(--noteworthy);
   }
   .talk-card.spotlight .relevance-dot { background: var(--spotlight); }
   .talk-card.important .relevance-dot { background: var(--important); }
-  .talk-card.noteworthy .relevance-dot { background: var(--noteworthy); }
   .talk-card .talk-title {
     font-family: 'Fraunces', Georgia, serif;
     font-size: 17px;
@@ -368,7 +340,7 @@
     border-bottom: 1px solid transparent;
     transition: border 0.15s ease;
   }
-  .talk-card .more a:hover { border-bottom-color: var(--accent); color: var(--accent-dark); }
+  .talk-card .more a:hover { border-bottom-color: var(--accent); }
   .talk-card .expand-toggle {
     color: var(--ink-faint);
     font-family: 'JetBrains Mono', monospace;
@@ -389,14 +361,13 @@
   .ws-card {
     background: var(--paper-raised);
     border: 1px solid var(--rule);
-    border-top: 3px solid var(--accent);
+    border-top: 3px solid var(--noteworthy);
     padding: 24px 28px;
     transition: border-color 0.15s ease;
   }
   .ws-card:hover { border-color: var(--ink-faint); }
   .ws-card.spotlight { border-top-color: var(--spotlight); }
   .ws-card.important { border-top-color: var(--important); }
-  .ws-card.noteworthy { border-top-color: var(--noteworthy); }
 
   .ws-card .ws-meta {
     font-family: 'JetBrains Mono', monospace;
@@ -412,7 +383,6 @@
   .ws-card .ws-meta .relevance-tag { font-weight: 500; }
   .ws-card.spotlight .ws-meta .relevance-tag { color: var(--spotlight); }
   .ws-card.important .ws-meta .relevance-tag { color: var(--important); }
-  .ws-card.noteworthy .ws-meta .relevance-tag { color: var(--noteworthy); }
 
   .ws-card h3 {
     font-family: 'Fraunces', Georgia, serif;
@@ -452,7 +422,7 @@
   .ws-card.speakers-expanded .ws-speakers-list .ws-speaker-entry { display: list-item; }
   .ws-spk-name { font-weight: 500; }
   .ws-speaker-entry.spotlight .ws-spk-name { color: var(--spotlight); }
-  .ws-speaker-entry.important .ws-spk-name { color: var(--accent-dark); }
+  .ws-speaker-entry.important .ws-spk-name { color: var(--ink); }
   .ws-spk-aff {
     font-style: italic;
     color: var(--ink-faint);
@@ -483,7 +453,7 @@
     padding-bottom: 1px;
   }
   .ws-card .ws-link::before { content: "→ "; }
-  .ws-card .ws-link:hover { border-bottom-color: var(--accent); color: var(--accent-dark); }
+  .ws-card .ws-link:hover { border-bottom-color: var(--accent); }
 
   /* ----- Speaker index ----- */
   .speaker-index {
@@ -548,8 +518,6 @@
     margin-bottom: 12px;
     letter-spacing: -0.01em;
   }
-  .about-panel a { color: var(--accent); }
-  .about-panel a:hover { color: var(--accent-dark); }
   .legend {
     display: flex;
     gap: 24px;
@@ -572,7 +540,7 @@
   }
   .legend-item .dot.spotlight { background: var(--spotlight); }
   .legend-item .dot.important { background: var(--important); }
-  .legend-item .dot.noteworthy { background: var(--noteworthy); }
+  .legend-item .dot.noteworthy { background: var(--ink-faint); }
   .legend-item b { color: var(--ink); font-weight: 500; }
 
   /* footer */
@@ -594,7 +562,6 @@
     gap: 16px;
   }
   footer a { color: var(--accent); text-decoration: none; }
-  footer a:hover { color: var(--accent-dark); }
 
   /* Empty state */
   .empty {
@@ -607,9 +574,7 @@
 
   /* Mobile */
   @media (max-width: 720px) {
-    header.masthead { padding: 28px 20px 24px; }
-    .masthead-top { gap: 20px; }
-    .logo-wrap img { height: 44px; }
+    header.masthead { padding: 32px 20px 28px; }
     nav.tabs { padding: 0 20px; }
     main { padding: 24px 20px; }
     .timeslot { grid-template-columns: 1fr; gap: 8px; }
@@ -631,16 +596,9 @@
 <body>
 
 <header class="masthead">
-  <div class="masthead-top">
-    <div class="masthead-text">
-      <div class="kicker">ICRA 2026 <span class="dot"></span> Vienna, Austria <span class="dot"></span> 1–5 June</div>
-      <h1 class="title">A workshop guide for <em>algorithms of motion.</em></h1>
-      <p class="subtitle">Curated for members of the IEEE RAS Technical Committee on Algorithms for Planning and Control of Robot Motion.</p>
-    </div>
-    <div class="logo-wrap">
-      <img src="logo.png" alt="ICRA 2026 Vienna">
-    </div>
-  </div>
+  <div class="kicker">ICRA 2026 <span class="dot"></span> Vienna, Austria <span class="dot"></span> 1–5 June</div>
+  <h1 class="title">A workshop guide for <em>algorithms of motion.</em></h1>
+  <p class="subtitle">Curated for members of the IEEE RAS Technical Committee on Algorithms for Planning and Control of Robot Motion.</p>
   <div class="meta" id="meta">
     <span>Loading…</span>
   </div>
@@ -809,7 +767,7 @@ function buildUI(days) {
 <section id="panel-about" class="panel">
   <div class="about-panel">
     <h2>About this guide.</h2>
-    <p>This is a curated catalog of sessions at <a href="https://2026.ieee-icra.org/workshops-and-tutorials/">ICRA 2026</a> relevant to members of the IEEE RAS Technical Committee on Algorithms for Planning and Control of Robot Motion. Sessions are sourced from workshop program pages and ranked by relevance to the TC.</p>
+    <p>This is a curated catalog of sessions at <a href="https://2026.ieee-icra.org/workshops-and-tutorials/" style="color:var(--accent)">ICRA 2026</a> relevant to members of the IEEE RAS Technical Committee on Algorithms for Planning and Control of Robot Motion. Sessions are sourced from workshop program pages and ranked by relevance to the TC.</p>
 
     <h3>How to read it.</h3>
     <p>Each day tab gives you a chronological timeline. Click any session card to expand and see the rationale for why it matters to the TC. The Workshops tab shows workshop-type sessions across all loaded days. The Speakers tab is an alphabetical index built from speaker data in the CSVs.</p>
