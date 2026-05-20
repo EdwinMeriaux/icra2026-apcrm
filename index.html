@@ -358,38 +358,51 @@
     content: "▸ ";
   }
   .talk-card .why {
-    margin-top: 10px;
     font-size: 13px;
     color: var(--ink-dim);
     line-height: 1.5;
-    display: none;
   }
-  .talk-card.expanded .why { display: block; }
-  .talk-card .more {
-    margin-top: 10px;
-    display: flex;
-    gap: 16px;
-    align-items: center;
+  .talk-card .card-link {
+    margin-top: 8px;
+    display: block;
     font-family: 'JetBrains Mono', monospace;
     font-size: 11px;
-  }
-  .talk-card .more a {
     color: var(--accent);
     text-decoration: none;
     border-bottom: 1px solid transparent;
     transition: border 0.15s ease;
   }
-  .talk-card .more a:hover { border-bottom-color: var(--accent); color: var(--accent-dark); }
-  .talk-card .expand-toggle {
-    color: var(--ink-faint);
+  .talk-card .card-link:hover { border-bottom-color: var(--accent); color: var(--accent-dark); }
+
+  /* ----- Unified section toggle ----- */
+  .section-toggle {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    border-top: 1px solid var(--rule);
+    padding: 7px 0 2px;
+    margin-top: 10px;
     font-family: 'JetBrains Mono', monospace;
     font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 0.08em;
+    color: var(--ink-faint);
     cursor: pointer;
     user-select: none;
   }
-  .talk-card .expand-toggle:hover { color: var(--ink-dim); }
+  .section-toggle:hover { color: var(--ink-dim); }
+  .section-toggle::before { content: '+ '; }
+  .section-toggle.open::before { content: '— '; }
+  .section-content { display: none; padding-top: 8px; }
+  .section-content.open { display: block; }
+  .section-content img {
+    width: 100%;
+    max-width: 480px;
+    border: 1px solid var(--rule);
+    display: block;
+  }
 
   /* ----- Paper session cards ----- */
   .talk-card.paper-session { border-left-color: var(--secondary); }
@@ -510,53 +523,7 @@
     color: var(--ink-dim);
     line-height: 1.75;
   }
-  .papers-toggle {
-    background: none;
-    border: none;
-    padding: 0;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--ink-faint);
-    cursor: pointer;
-    user-select: none;
-  }
-  .papers-toggle:hover { color: var(--ink-dim); }
-
-  .talk-card .map-toggle {
-    color: var(--ink-faint);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    cursor: pointer;
-    user-select: none;
-    background: none;
-    border: none;
-    padding: 0;
-  }
-  .talk-card .map-toggle:hover { color: var(--ink-dim); }
-  .talk-map {
-    display: none;
-    margin-top: 12px;
-  }
-  .talk-card.map-expanded .talk-map { display: block; }
-  .talk-map img {
-    width: 100%;
-    max-width: 480px;
-    border: 1px solid var(--rule);
-    display: block;
-  }
-  .session-map {
-    margin: 10px 0 14px;
-  }
-  .session-map img {
-    width: 100%;
-    max-width: 480px;
-    border: 1px solid var(--rule);
-    display: block;
-  }
+  .papers-list { display: contents; }  /* visibility handled by section-content */
 
   /* ----- Workshop view ----- */
   .ws-grid {
@@ -1018,25 +985,19 @@ function buildUI(days) {
 <section id="panel-about" class="panel">
   <div class="about-panel">
     <h2>About this guide.</h2>
-    <p>This is a curated catalog of sessions at <a href="https://2026.ieee-icra.org/workshops-and-tutorials/">ICRA 2026</a> relevant to members of the IEEE RAS Technical Committee on Algorithms for Planning and Control of Robot Motion. Sessions are sourced from workshop program pages and ranked by relevance to the TC.</p>
+    <p>A curated program companion for members of the <a href="https://www.ieee-ras.org/algorithms-for-planning-and-control-of-robot-motion">IEEE RAS Technical Committee on Algorithms for Planning and Control of Robot Motion</a> attending <a href="https://2026.ieee-icra.org/">ICRA 2026</a> in Vienna, 19–23 May 2026.</p>
+    <p>The guide covers the full conference week — pre-conference networking (Sunday), workshop days (Monday and Friday), and the main conference (Tuesday through Thursday). Workshop sessions are ranked by TC relevance. Conference paper sessions surface every paper from the TC's core scope, pulled directly from the ICRA 2026 program.</p>
 
-    <h3>How to read it.</h3>
-    <p>Each day tab gives you a chronological timeline. Click any session card to expand and see the rationale for why it matters to the TC. The Workshops tab shows workshop-type sessions across all loaded days. The Speakers tab is an alphabetical index built from speaker data in the CSVs.</p>
+    <h3>Navigating the guide.</h3>
+    <p>Each day has its own tab with a chronological timeline. Sessions cards show the location and, where available, a venue map. Expandable sections on each card reveal the TC relevance rationale, the map, or the paper list depending on the session type. Clicking a paper title opens a detail panel with the full abstract and matched TC keywords.</p>
+    <p>The <b>Workshops</b> tab gives an overview of every workshop and tutorial, with its full speaker roster. The <b>Speakers</b> tab is an alphabetical index of all named speakers appearing in the workshop days.</p>
 
+    <h3>Relevance labels.</h3>
     <div class="legend">
-      <div class="legend-item"><span class="dot spotlight"></span><span><b>Spotlight</b> — top pick. Don't miss.</span></div>
-      <div class="legend-item"><span class="dot important"></span><span><b>Important</b> — strongly relevant.</span></div>
+      <div class="legend-item"><span class="dot spotlight"></span><span><b>Spotlight</b> — top pick for TC members. Don't miss.</span></div>
+      <div class="legend-item"><span class="dot important"></span><span><b>Important</b> — strongly TC-relevant.</span></div>
       <div class="legend-item"><span class="dot noteworthy"></span><span><b>Noteworthy</b> — worth knowing about.</span></div>
     </div>
-
-    <h3>The data.</h3>
-    <p>Each day's sessions live in a CSV file in the <code style="color:var(--ink);background:var(--paper-raised);padding:2px 6px;font-family:'JetBrains Mono',monospace;font-size:12px">data/</code> folder. To add a day, drop a new CSV and uncomment (or add) one line to the <code style="color:var(--ink);background:var(--paper-raised);padding:2px 6px;font-family:'JetBrains Mono',monospace;font-size:12px">DAYS</code> config at the top of the script block.</p>
-
-    <h3>CSV columns.</h3>
-    <p>Expected headers: <code style="color:var(--ink);background:var(--paper-raised);padding:2px 6px;font-family:'JetBrains Mono',monospace;font-size:12px">day, date, start_time, end_time, session_code, session_type, location, title, priority, tc_relevance_reason, url</code>. Optional extras (used when present): <code style="color:var(--ink);background:var(--paper-raised);padding:2px 6px;font-family:'JetBrains Mono',monospace;font-size:12px">speaker, affiliation</code>.</p>
-
-    <h3>Print.</h3>
-    <p>This page is set up to print all content tabs as separate sections — useful for a paper handout. Use your browser's "Save as PDF" or "Print" function.</p>
   </div>
 </section>`;
 
@@ -1076,12 +1037,16 @@ function buildPaperSessions(rows) {
   });
 }
 
+const TOGGLE_ONCLICK = `var b=this,c=b.nextElementSibling;c.classList.toggle('open');b.classList.toggle('open')`;
+
 function renderPaperSessionCard(s) {
   const tag = [s.session_code, s.session_type].filter(Boolean).join(' · ');
   const locationHtml = (s.location && s.location !== 'TBA')
     ? `<div class="location">${escapeHtml(s.location)}</div>` : '';
-  const mapImg  = LOCATION_MAPS[s.location];
-  const mapHtml = mapImg ? `<div class="session-map"><img src="${escapeAttr(mapImg)}" alt="Map of ${escapeAttr(s.location)}" loading="lazy"></div>` : '';
+  const mapImg = LOCATION_MAPS[s.location];
+  const mapSection = mapImg ? `
+  <button class="section-toggle" onclick="${TOGGLE_ONCLICK}">Map</button>
+  <div class="section-content"><img src="${escapeAttr(mapImg)}" alt="Map of ${escapeAttr(s.location)}" loading="lazy"></div>` : '';
   const n = s.papers.length;
   const papersHtml = s.papers.map(p => {
     const kw = (p.matched_tc_keywords || '').split(';').map(k => k.trim()).filter(Boolean);
@@ -1095,11 +1060,9 @@ function renderPaperSessionCard(s) {
   <div class="workshop-tag"><span class="relevance-dot"></span>${escapeHtml(tag)}</div>
   <div class="talk-title">${escapeHtml(s.session_code)} — ${escapeHtml(s.session_type)}</div>
   ${locationHtml}
-  ${mapHtml}
-  <div class="papers-list">${papersHtml}</div>
-  <div class="more">
-    <button class="papers-toggle" onclick="var c=this.closest('.talk-card');c.classList.toggle('papers-expanded');this.textContent=c.classList.contains('papers-expanded')?'— hide':'+ show ${n} paper${n !== 1 ? 's' : ''}'">+ show ${n} paper${n !== 1 ? 's' : ''}</button>
-  </div>
+  ${mapSection}
+  <button class="section-toggle" onclick="${TOGGLE_ONCLICK}">${n} paper${n !== 1 ? 's' : ''}</button>
+  <div class="section-content papers-list">${papersHtml}</div>
 </div>`;
 }
 
@@ -1159,14 +1122,6 @@ function renderTimeline(dayKey, filterRel, search) {
   }
   container.innerHTML = html;
 
-  container.querySelectorAll('.talk-card').forEach(card => {
-    card.addEventListener('click', e => {
-      if (e.target.tagName === 'A') return;
-      card.classList.toggle('expanded');
-      const t = card.querySelector('.expand-toggle');
-      if (t) t.textContent = card.classList.contains('expanded') ? '— less' : '+ more';
-    });
-  });
 }
 
 function renderCard(s) {
@@ -1178,24 +1133,24 @@ function renderCard(s) {
     ? `<div class="speaker"><span class="name">${escapeHtml(s.speaker)}</span>${s.affiliation ? ` <span class="aff">· ${escapeHtml(s.affiliation)}</span>` : ''}</div>`
     : '';
   const locationHtml = (s.location && s.location !== 'TBA')
-    ? `<div class="location">${escapeHtml(s.location)}</div>`
-    : '';
+    ? `<div class="location">${escapeHtml(s.location)}</div>` : '';
+  const urlHtml = s.url
+    ? `<a class="card-link" href="${escapeAttr(s.url)}" target="_blank" rel="noopener">session page ↗</a>` : '';
   const mapImg = LOCATION_MAPS[s.location];
-  const mapHtml = mapImg
-    ? `<div class="talk-map"><img src="${escapeAttr(mapImg)}" alt="Map of ${escapeAttr(s.location)}" loading="lazy"></div>`
-    : '';
-  const mapToggle = mapImg
-    ? `<button class="map-toggle" onclick="var c=this.closest('.talk-card');c.classList.toggle('map-expanded');this.textContent=c.classList.contains('map-expanded')?'map ▴':'map ▾'">map ▾</button>`
-    : '';
-  const hasDetail = s.why || s.url || mapImg;
+  const whySection = s.why ? `
+  <button class="section-toggle" onclick="${TOGGLE_ONCLICK}">Why this matters</button>
+  <div class="section-content"><div class="why">${escapeHtml(s.why)}</div></div>` : '';
+  const mapSection = mapImg ? `
+  <button class="section-toggle" onclick="${TOGGLE_ONCLICK}">Map</button>
+  <div class="section-content"><img src="${escapeAttr(mapImg)}" alt="Map of ${escapeAttr(s.location)}" loading="lazy"></div>` : '';
   return `<div class="talk-card ${escapeAttr(s.relevance)}">
   <div class="workshop-tag"><span class="relevance-dot"></span>${escapeHtml(tag)}</div>
   <div class="talk-title">${escapeHtml(s.title)}</div>
   ${speakerHtml}
   ${locationHtml}
-  ${s.why ? `<div class="why">${escapeHtml(s.why)}</div>` : ''}
-  ${mapHtml}
-  ${hasDetail ? `<div class="more">${s.why ? '<span class="expand-toggle">+ more</span>' : ''}${mapToggle}${s.url ? `<a href="${escapeAttr(s.url)}" target="_blank" rel="noopener">session page ↗</a>` : ''}</div>` : ''}
+  ${urlHtml}
+  ${whySection}
+  ${mapSection}
 </div>`;
 }
 
