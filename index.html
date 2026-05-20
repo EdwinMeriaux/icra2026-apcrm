@@ -1059,9 +1059,9 @@ function renderPaperSessionCard(s) {
   <div class="workshop-tag"><span class="relevance-dot"></span>${escapeHtml(tag)}</div>
   <div class="talk-title">${escapeHtml(s.session_code)} — ${escapeHtml(s.session_type)}</div>
   ${locationHtml}
+  ${mapSection}
   <button class="section-toggle" onclick="${TOGGLE_ONCLICK}">${n} paper${n !== 1 ? 's' : ''}</button>
   <div class="section-content papers-list">${papersHtml}</div>
-  ${mapSection}
 </div>`;
 }
 
@@ -1148,8 +1148,8 @@ function renderCard(s) {
   ${speakerHtml}
   ${locationHtml}
   ${urlHtml}
-  ${whySection}
   ${mapSection}
+  ${whySection}
 </div>`;
 }
 
