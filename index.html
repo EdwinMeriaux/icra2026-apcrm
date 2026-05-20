@@ -548,6 +548,15 @@
     border: 1px solid var(--rule);
     display: block;
   }
+  .session-map {
+    margin: 10px 0 14px;
+  }
+  .session-map img {
+    width: 100%;
+    max-width: 480px;
+    border: 1px solid var(--rule);
+    display: block;
+  }
 
   /* ----- Workshop view ----- */
   .ws-grid {
@@ -853,14 +862,18 @@ const DAYS = [
 // ============================================================================
 // PAPERS FILE
 // ============================================================================
-const PAPERS_FILE = 'icra26_tc_motion_papers.csv';
+const PAPERS_FILE        = 'icra26_tc_motion_papers.csv';
+const SESSION_HALLS_FILE = 'icra26_sessions_halls.csv';
 
 // ============================================================================
 // LOCATION → MAP  (add entries here as more rooms are confirmed)
 // ============================================================================
 const LOCATION_MAPS = {
   'Hall A1 (Plenary)':  'maps/Hall_A.png',
+  'Hall A2':            'maps/Hall_A.png',
   'Hall A3':            'maps/Hall_A.png',
+  'Hall C':             'maps/Hall_C.png',
+  'Lehar 1-4':          'maps/congress_center.png',
   'Strauss 1-2':        'maps/congress_center.png',
 };
 
@@ -1052,7 +1065,7 @@ function buildPaperSessions(rows) {
     return {
       day: s.day, date: '', time, start_time: start,
       session_code: s.session, session_type: s.session_type,
-      workshop_name: '', location: s.hall,
+      workshop_name: '', location: SESSION_HALLS[s.session] || s.hall,
       title: `${n} TC-relevant paper${n !== 1 ? 's' : ''}`,
       relevance: 'noteworthy', why: '', url: '', speaker: '',
       affiliation: '', workshop_about: '',
@@ -1067,9 +1080,8 @@ function renderPaperSessionCard(s) {
   const tag = [s.session_code, s.session_type].filter(Boolean).join(' · ');
   const locationHtml = (s.location && s.location !== 'TBA')
     ? `<div class="location">${escapeHtml(s.location)}</div>` : '';
-  const mapImg    = LOCATION_MAPS[s.location];
-  const mapHtml   = mapImg ? `<div class="talk-map"><img src="${escapeAttr(mapImg)}" alt="Map" loading="lazy"></div>` : '';
-  const mapToggle = mapImg ? `<button class="map-toggle" onclick="var c=this.closest('.talk-card');c.classList.toggle('map-expanded');this.textContent=c.classList.contains('map-expanded')?'map ▴':'map ▾'">map ▾</button>` : '';
+  const mapImg  = LOCATION_MAPS[s.location];
+  const mapHtml = mapImg ? `<div class="session-map"><img src="${escapeAttr(mapImg)}" alt="Map of ${escapeAttr(s.location)}" loading="lazy"></div>` : '';
   const n = s.papers.length;
   const papersHtml = s.papers.map(p => {
     const kw = (p.matched_tc_keywords || '').split(';').map(k => k.trim()).filter(Boolean);
@@ -1087,7 +1099,6 @@ function renderPaperSessionCard(s) {
   <div class="papers-list">${papersHtml}</div>
   <div class="more">
     <button class="papers-toggle" onclick="var c=this.closest('.talk-card');c.classList.toggle('papers-expanded');this.textContent=c.classList.contains('papers-expanded')?'— hide':'+ show ${n} paper${n !== 1 ? 's' : ''}'">+ show ${n} paper${n !== 1 ? 's' : ''}</button>
-    ${mapToggle}
   </div>
 </div>`;
 }
@@ -1385,7 +1396,8 @@ function escapeAttr(s) { return escapeHtml(s); }
 let DAYS_LOADED = [];
 let ALL_SESSIONS = [];
 let PAPER_SESSIONS = [];
-let PAPERS_LOOKUP = {};   // paper_id → paper row
+let PAPERS_LOOKUP  = {};  // paper_id → paper row
+let SESSION_HALLS  = {};  // session_code → hall
 const state = {};
 
 function setupEvents() {
@@ -1478,6 +1490,15 @@ async function init() {
   days.forEach((d, i) => { d.sessions = results[i]; });
   DAYS_LOADED = days;
   ALL_SESSIONS = results.flat();
+
+  // Load session → hall lookup
+  const hallsText = await fetch(SESSION_HALLS_FILE)
+    .then(r => r.ok ? r.text() : '').catch(() => '');
+  if (hallsText) {
+    for (const row of parseCSV(hallsText)) {
+      if (row.session && row.hall) SESSION_HALLS[row.session] = row.hall;
+    }
+  }
 
   // Load TC papers
   const papersText = await fetch(PAPERS_FILE)
