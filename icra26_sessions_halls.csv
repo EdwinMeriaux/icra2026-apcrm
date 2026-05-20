@@ -1,0 +1,58 @@
+day,session,session_type,hall
+Tuesday,TuAT1,Award Session,Hall A2
+Tuesday,TuAT2,Regular Session,Hall A3
+Tuesday,TuAT3,Regular Session,Lehar 1-4
+Tuesday,TuAT4,Regular Session,Strauss 1-2
+Tuesday,TuAT5,Keynote Session,Hall A1 (Plenary)
+Tuesday,TuBT1,Award Session,Hall A2
+Tuesday,TuBT2,Regular Session,Hall A3
+Tuesday,TuBT3,Regular Session,Lehar 1-4
+Tuesday,TuBT4,Regular Session,Strauss 1-2
+Tuesday,TuBT5,Keynote Session,Hall A1 (Plenary)
+Tuesday,TuI1I,Interactive Session,Hall C
+Tuesday,TuI1K,Keynote Session,Strauss 1-2
+Tuesday,TuI1LB,Late Breaking Results Session,Hall C
+Tuesday,TuI1P,Keynote Session,Hall A1 (Plenary)
+Tuesday,TuI2I,Interactive Session,Hall C
+Tuesday,TuI2K,Keynote Session,Strauss 1-2
+Tuesday,TuI2LB,Late Breaking Results Session,Hall C
+Tuesday,TuI2P,Keynote Session,Hall A1 (Plenary)
+Tuesday,TuPL,Plenary Session,Hall A1 (Plenary)
+Wednesday,WeAT1,Award Session,Hall A2
+Wednesday,WeAT2,Regular Session,Hall A3
+Wednesday,WeAT3,Regular Session,Lehar 1-4
+Wednesday,WeAT4,Regular Session,Strauss 1-2
+Wednesday,WeAT5,Keynote Session,Hall A1 (Plenary)
+Wednesday,WeBT1,Award Session,Hall A2
+Wednesday,WeBT2,Regular Session,Hall A3
+Wednesday,WeBT3,Regular Session,Lehar 1-4
+Wednesday,WeBT4,Regular Session,Strauss 1-2
+Wednesday,WeBT5,Keynote Session,Hall A1 (Plenary)
+Wednesday,WeI1I,Interactive Session,Hall C
+Wednesday,WeI1K,Keynote Session,Strauss 1-2
+Wednesday,WeI1LB,Late Breaking Results Session,Hall C
+Wednesday,WeI1P,Keynote Session,Hall A1 (Plenary)
+Wednesday,WeI2I,Interactive Session,Hall C
+Wednesday,WeI2K,Keynote Session,Strauss 1-2
+Wednesday,WeI2LB,Late Breaking Results Session,Hall C
+Wednesday,WeI2P,Keynote Session,Hall A1 (Plenary)
+Wednesday,WePL,Plenary Session,Hall A1 (Plenary)
+Thursday,ThAT1,Regular Session,Hall A2
+Thursday,ThAT2,Regular Session,Hall A3
+Thursday,ThAT3,Regular Session,Lehar 1-4
+Thursday,ThAT4,Regular Session,Strauss 1-2
+Thursday,ThAT5,Keynote Session,Hall A1 (Plenary)
+Thursday,ThBT1,Regular Session,Hall A2
+Thursday,ThBT2,Regular Session,Hall A3
+Thursday,ThBT3,Regular Session,Lehar 1-4
+Thursday,ThBT4,Regular Session,Strauss 1-2
+Thursday,ThBT5,Keynote Session,Hall A1 (Plenary)
+Thursday,ThI1I,Interactive Session,Hall C
+Thursday,ThI1K,Keynote Session,Strauss 1-2
+Thursday,ThI1LB,Late Breaking Results Session,Hall C
+Thursday,ThI1P,Keynote Session,Hall A1 (Plenary)
+Thursday,ThI2I,Interactive Session,Hall C
+Thursday,ThI2K,Keynote Session,Strauss 1-2
+Thursday,ThI2LB,Late Breaking Results Session,Hall C
+Thursday,ThI2P,Keynote Session,Hall A1 (Plenary)
+Thursday,ThPL,Plenary Session,Hall A1 (Plenary)

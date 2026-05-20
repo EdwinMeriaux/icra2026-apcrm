@@ -391,6 +391,50 @@
   }
   .talk-card .expand-toggle:hover { color: var(--ink-dim); }
 
+  /* ----- Paper session cards ----- */
+  .talk-card.paper-session { border-left-color: var(--secondary); }
+  .talk-card.paper-session .relevance-dot { background: var(--secondary); }
+  .papers-list { display: none; margin-top: 10px; }
+  .talk-card.papers-expanded .papers-list { display: block; }
+  .paper-entry {
+    padding: 9px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .paper-entry:last-child { border-bottom: none; }
+  .paper-entry .paper-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink);
+    line-height: 1.4;
+    margin-bottom: 3px;
+  }
+  .paper-entry .paper-authors {
+    font-size: 11px;
+    color: var(--ink-faint);
+    font-style: italic;
+  }
+  .paper-entry .paper-kw {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 3px;
+  }
+  .papers-toggle {
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-faint);
+    cursor: pointer;
+    user-select: none;
+  }
+  .papers-toggle:hover { color: var(--ink-dim); }
+
   .talk-card .map-toggle {
     color: var(--ink-faint);
     font-family: 'JetBrains Mono', monospace;
@@ -705,6 +749,11 @@ const DAYS = [
 ];
 
 // ============================================================================
+// PAPERS FILE
+// ============================================================================
+const PAPERS_FILE = 'icra26_tc_motion_papers.csv';
+
+// ============================================================================
 // LOCATION → MAP  (add entries here as more rooms are confirmed)
 // ============================================================================
 const LOCATION_MAPS = {
@@ -880,6 +929,67 @@ function buildUI(days) {
 }
 
 // ============================================================================
+// PAPER SESSIONS
+// ============================================================================
+function buildPaperSessions(rows) {
+  const map = new Map();
+  for (const p of rows) {
+    const key = `${p.day}|${p.session}`;
+    if (!map.has(key)) map.set(key, { day: p.day, session: p.session, session_type: p.session_type, hall: p.hall, papers: [] });
+    map.get(key).papers.push(p);
+  }
+  return [...map.values()].map(s => {
+    const times = s.papers.map(p => p.time_slot).filter(Boolean);
+    const starts = times.map(t => t.split('-')[0].trim()).filter(Boolean).sort();
+    const ends   = times.map(t => (t.split('-')[1] || '').trim()).filter(Boolean).sort();
+    const start  = starts[0] || '';
+    const end    = ends[ends.length - 1] || '';
+    const time   = start ? `${start}–${end}` : 'TBA';
+    const n      = s.papers.length;
+    return {
+      day: s.day, date: '', time, start_time: start,
+      session_code: s.session, session_type: s.session_type,
+      workshop_name: '', location: s.hall,
+      title: `${n} TC-relevant paper${n !== 1 ? 's' : ''}`,
+      relevance: 'noteworthy', why: '', url: '', speaker: '',
+      affiliation: '', workshop_about: '',
+      isPaperSession: true,
+      papers: s.papers,
+      searchText: s.papers.map(p => `${p.title} ${p.authors} ${p.matched_tc_keywords || ''}`).join(' '),
+    };
+  });
+}
+
+function renderPaperSessionCard(s) {
+  const tag = [s.session_code, s.session_type].filter(Boolean).join(' · ');
+  const locationHtml = (s.location && s.location !== 'TBA')
+    ? `<div class="location">${escapeHtml(s.location)}</div>` : '';
+  const mapImg    = LOCATION_MAPS[s.location];
+  const mapHtml   = mapImg ? `<div class="talk-map"><img src="${escapeAttr(mapImg)}" alt="Map" loading="lazy"></div>` : '';
+  const mapToggle = mapImg ? `<button class="map-toggle" onclick="var c=this.closest('.talk-card');c.classList.toggle('map-expanded');this.textContent=c.classList.contains('map-expanded')?'map ▴':'map ▾'">map ▾</button>` : '';
+  const n = s.papers.length;
+  const papersHtml = s.papers.map(p => {
+    const kw = (p.matched_tc_keywords || '').split(';').map(k => k.trim()).filter(Boolean);
+    return `<div class="paper-entry">
+  <div class="paper-title">${escapeHtml(p.title)}</div>
+  <div class="paper-authors">${escapeHtml(p.authors)}</div>
+  ${kw.length ? `<div class="paper-kw">${kw.map(escapeHtml).join(' · ')}</div>` : ''}
+</div>`;
+  }).join('');
+  return `<div class="talk-card paper-session noteworthy">
+  <div class="workshop-tag"><span class="relevance-dot"></span>${escapeHtml(tag)}</div>
+  <div class="talk-title">${n} TC-relevant paper${n !== 1 ? 's' : ''}</div>
+  ${locationHtml}
+  ${mapHtml}
+  <div class="papers-list">${papersHtml}</div>
+  <div class="more">
+    <button class="papers-toggle" onclick="var c=this.closest('.talk-card');c.classList.toggle('papers-expanded');this.textContent=c.classList.contains('papers-expanded')?'— hide':'+ show ${n} paper${n !== 1 ? 's' : ''}'">+ show ${n} paper${n !== 1 ? 's' : ''}</button>
+    ${mapToggle}
+  </div>
+</div>`;
+}
+
+// ============================================================================
 // RENDERING
 // ============================================================================
 const RELEVANCE_ORDER = { spotlight: 0, important: 1, noteworthy: 2 };
@@ -908,12 +1018,13 @@ function renderTimeline(dayKey, filterRel, search) {
   const countEl   = document.getElementById(`count-${dayKey}`);
   const dayObj    = DAYS_LOADED.find(d => d.key === dayKey);
 
-  let sessions = dayObj ? [...dayObj.sessions] : [];
+  const dayPapers = PAPER_SESSIONS.filter(ps => ps.day === dayObj?.label);
+  let sessions = [...(dayObj ? dayObj.sessions : []), ...dayPapers];
   if (filterRel !== 'all') sessions = sessions.filter(s => s.relevance === filterRel);
   if (search) {
     const q = search.toLowerCase();
     sessions = sessions.filter(s =>
-      `${s.title} ${s.session_code} ${s.session_type} ${s.why} ${s.location} ${s.speaker}`.toLowerCase().includes(q)
+      `${s.title} ${s.session_code} ${s.session_type} ${s.why} ${s.location} ${s.speaker} ${s.searchText || ''}`.toLowerCase().includes(q)
     );
   }
 
@@ -945,6 +1056,7 @@ function renderTimeline(dayKey, filterRel, search) {
 }
 
 function renderCard(s) {
+  if (s.isPaperSession) return renderPaperSessionCard(s);
   const workshopLabel = s.workshop_name || s.session_type;
   const shortLabel = workshopLabel.length > 52 ? workshopLabel.slice(0, 49) + '…' : workshopLabel;
   const tag = [s.session_code, shortLabel].filter(Boolean).join(' · ');
@@ -1150,6 +1262,7 @@ function escapeAttr(s) { return escapeHtml(s); }
 // ============================================================================
 let DAYS_LOADED = [];
 let ALL_SESSIONS = [];
+let PAPER_SESSIONS = [];
 const state = {};
 
 function setupEvents() {
@@ -1242,6 +1355,12 @@ async function init() {
   days.forEach((d, i) => { d.sessions = results[i]; });
   DAYS_LOADED = days;
   ALL_SESSIONS = results.flat();
+
+  // Load TC papers
+  const papersText = await fetch(PAPERS_FILE)
+    .then(r => r.ok ? r.text() : '')
+    .catch(() => '');
+  PAPER_SESSIONS = papersText ? buildPaperSessions(parseCSV(papersText)) : [];
 
   // Update header meta
   const metaEl = document.getElementById('meta');
