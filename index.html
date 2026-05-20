@@ -421,6 +421,95 @@
     letter-spacing: 0.05em;
     margin-top: 3px;
   }
+  .paper-entry .paper-title { cursor: pointer; }
+  .paper-entry .paper-title:hover { color: var(--secondary); }
+
+  /* ----- Paper modal ----- */
+  #paper-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 500;
+    background: rgba(0,0,0,0.45);
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  #paper-modal.open { display: flex; }
+  .paper-modal-box {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-top: 4px solid var(--secondary);
+    max-width: 760px;
+    width: 100%;
+    max-height: 88vh;
+    overflow-y: auto;
+    padding: 36px 40px;
+    position: relative;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+  }
+  .paper-modal-close {
+    position: absolute;
+    top: 16px; right: 20px;
+    background: none;
+    border: none;
+    font-size: 22px;
+    color: var(--ink-faint);
+    cursor: pointer;
+    line-height: 1;
+  }
+  .paper-modal-close:hover { color: var(--ink); }
+  .paper-modal-session {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--secondary);
+    margin-bottom: 12px;
+  }
+  .paper-modal-title {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: clamp(18px, 2.5vw, 26px);
+    font-weight: 600;
+    line-height: 1.25;
+    color: var(--ink);
+    margin: 0 0 16px;
+    letter-spacing: -0.01em;
+  }
+  .paper-modal-authors {
+    font-size: 13px;
+    color: var(--ink-dim);
+    margin-bottom: 6px;
+    line-height: 1.5;
+  }
+  .paper-modal-affil {
+    font-size: 12px;
+    color: var(--ink-faint);
+    font-style: italic;
+    margin-bottom: 16px;
+    line-height: 1.5;
+  }
+  .paper-modal-kw {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--secondary);
+    margin-bottom: 20px;
+  }
+  .paper-modal-abstract-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-faint);
+    margin-bottom: 8px;
+  }
+  .paper-modal-abstract {
+    font-size: 14px;
+    color: var(--ink-dim);
+    line-height: 1.75;
+  }
   .papers-toggle {
     background: none;
     border: none;
@@ -730,6 +819,19 @@
 
 <main id="main"></main>
 
+<div id="paper-modal" onclick="if(event.target===this)closePaper()">
+  <div class="paper-modal-box">
+    <button class="paper-modal-close" onclick="closePaper()">✕</button>
+    <div class="paper-modal-session" id="pm-session"></div>
+    <h2 class="paper-modal-title" id="pm-title"></h2>
+    <div class="paper-modal-authors" id="pm-authors"></div>
+    <div class="paper-modal-affil" id="pm-affil"></div>
+    <div class="paper-modal-kw" id="pm-kw"></div>
+    <div class="paper-modal-abstract-label">Abstract</div>
+    <div class="paper-modal-abstract" id="pm-abstract"></div>
+  </div>
+</div>
+
 <footer>
   <div>Built for the RAS TC on Algorithms for Planning &amp; Control of Robot Motion</div>
   <div>Source: <a href="https://2026.ieee-icra.org/workshops-and-tutorials/">2026.ieee-icra.org</a></div>
@@ -934,6 +1036,7 @@ function buildUI(days) {
 function buildPaperSessions(rows) {
   const map = new Map();
   for (const p of rows) {
+    PAPERS_LOOKUP[p.paper_id] = p;
     const key = `${p.day}|${p.session}`;
     if (!map.has(key)) map.set(key, { day: p.day, session: p.session, session_type: p.session_type, hall: p.hall, papers: [] });
     map.get(key).papers.push(p);
@@ -971,7 +1074,7 @@ function renderPaperSessionCard(s) {
   const papersHtml = s.papers.map(p => {
     const kw = (p.matched_tc_keywords || '').split(';').map(k => k.trim()).filter(Boolean);
     return `<div class="paper-entry">
-  <div class="paper-title">${escapeHtml(p.title)}</div>
+  <div class="paper-title" onclick="openPaper('${escapeAttr(p.paper_id)}')">${escapeHtml(p.title)}</div>
   <div class="paper-authors">${escapeHtml(p.authors)}</div>
   ${kw.length ? `<div class="paper-kw">${kw.map(escapeHtml).join(' · ')}</div>` : ''}
 </div>`;
@@ -1249,6 +1352,25 @@ function renderSpeakers(search) {
 // ============================================================================
 // UTILITIES
 // ============================================================================
+function openPaper(id) {
+  const p = PAPERS_LOOKUP[id];
+  if (!p) return;
+  const kw = (p.matched_tc_keywords || '').split(';').map(k => k.trim()).filter(Boolean);
+  document.getElementById('pm-session').textContent = [p.session, p.session_type, p.hall, p.time_slot].filter(Boolean).join(' · ');
+  document.getElementById('pm-title').textContent    = p.title;
+  document.getElementById('pm-authors').textContent  = p.authors;
+  document.getElementById('pm-affil').textContent    = p.affiliations || '';
+  document.getElementById('pm-kw').textContent       = kw.join(' · ');
+  document.getElementById('pm-abstract').textContent = p.abstract || 'No abstract available.';
+  document.getElementById('paper-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closePaper() {
+  document.getElementById('paper-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closePaper(); });
+
 function escapeHtml(s) {
   if (s == null) return '';
   return String(s)
@@ -1263,6 +1385,7 @@ function escapeAttr(s) { return escapeHtml(s); }
 let DAYS_LOADED = [];
 let ALL_SESSIONS = [];
 let PAPER_SESSIONS = [];
+let PAPERS_LOOKUP = {};   // paper_id → paper row
 const state = {};
 
 function setupEvents() {

@@ -117,6 +117,7 @@ OUT_DIR = Path(__file__).resolve().parent
 CSV_PATH = OUT_DIR / "icra26_tc_motion_papers.csv"
 MD_PATH = OUT_DIR / "icra26_tc_motion_papers.md"
 SESSIONS_CSV_PATH = OUT_DIR / "icra26_sessions_halls.csv"
+ALL_PAPERS_CSV_PATH = OUT_DIR / "icra26_all_papers.csv"
 
 
 # ---------------------------------------------------------------------------
@@ -381,6 +382,26 @@ def write_csv(papers: list[Paper], path: Path) -> None:
             ])
 
 
+def write_all_papers_csv(papers: list[Paper], path: Path) -> None:
+    """Dump every parsed paper (with abstract) regardless of TC match."""
+    with path.open("w", newline="", encoding="utf-8") as f:
+        w = csv.writer(f)
+        w.writerow([
+            "day", "session", "session_type", "hall",
+            "paper_id", "time_slot", "title",
+            "authors", "affiliations", "icra_keywords", "abstract",
+        ])
+        for p in papers:
+            w.writerow([
+                p.day, p.session, p.session_type, p.hall,
+                p.paper_id, p.time_slot, p.title,
+                "; ".join(n for n, _ in p.authors),
+                "; ".join(a for _, a in p.authors),
+                "; ".join(p.keywords),
+                p.abstract,
+            ])
+
+
 def write_sessions_csv(
     sessions_by_day: dict[str, dict[str, tuple[str, str]]],
     path: Path,
@@ -459,12 +480,17 @@ def main() -> int:
     day_order = {"Tuesday": 0, "Wednesday": 1, "Thursday": 2}
     matched.sort(key=lambda p: (day_order.get(p.day, 99), p.session, p.paper_id))
 
+    # Sort *all* parsed papers the same way and dump them with abstracts
+    all_papers.sort(key=lambda p: (day_order.get(p.day, 99), p.session, p.paper_id))
+    write_all_papers_csv(all_papers, ALL_PAPERS_CSV_PATH)
+
     write_csv(matched, CSV_PATH)
     write_markdown(matched, MD_PATH)
     write_sessions_csv(sessions_by_day, SESSIONS_CSV_PATH)
     print(f"\nWrote {CSV_PATH}")
     print(f"Wrote {MD_PATH}")
     print(f"Wrote {SESSIONS_CSV_PATH}")
+    print(f"Wrote {ALL_PAPERS_CSV_PATH}")
     return 0
 
 
