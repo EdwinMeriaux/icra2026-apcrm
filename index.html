@@ -346,6 +346,17 @@
     color: var(--ink-faint);
     font-style: italic;
   }
+  .talk-card .location {
+    margin-top: 5px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .talk-card .location::before {
+    content: "▸ ";
+  }
   .talk-card .why {
     margin-top: 10px;
     font-size: 13px;
@@ -902,15 +913,19 @@ function renderTimeline(dayKey, filterRel, search) {
 function renderCard(s) {
   const workshopLabel = s.workshop_name || s.session_type;
   const shortLabel = workshopLabel.length > 52 ? workshopLabel.slice(0, 49) + '…' : workshopLabel;
-  const tag = [s.session_code, shortLabel, (s.location && s.location !== 'TBA') ? s.location : ''].filter(Boolean).join(' · ');
+  const tag = [s.session_code, shortLabel].filter(Boolean).join(' · ');
   const speakerHtml = s.speaker
     ? `<div class="speaker"><span class="name">${escapeHtml(s.speaker)}</span>${s.affiliation ? ` <span class="aff">· ${escapeHtml(s.affiliation)}</span>` : ''}</div>`
+    : '';
+  const locationHtml = (s.location && s.location !== 'TBA')
+    ? `<div class="location">${escapeHtml(s.location)}</div>`
     : '';
   const hasDetail = s.why || s.url;
   return `<div class="talk-card ${escapeAttr(s.relevance)}">
   <div class="workshop-tag"><span class="relevance-dot"></span>${escapeHtml(tag)}</div>
   <div class="talk-title">${escapeHtml(s.title)}</div>
   ${speakerHtml}
+  ${locationHtml}
   ${s.why ? `<div class="why">${escapeHtml(s.why)}</div>` : ''}
   ${hasDetail ? `<div class="more">${s.why ? '<span class="expand-toggle">+ more</span>' : ''}${s.url ? `<a href="${escapeAttr(s.url)}" target="_blank" rel="noopener">session page ↗</a>` : ''}</div>` : ''}
 </div>`;
