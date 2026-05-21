@@ -778,8 +778,8 @@
   <div class="masthead-top">
     <div class="masthead-text">
       <div class="kicker">ICRA 2026 <span class="dot"></span> Vienna, Austria <span class="dot"></span> 1–5 June</div>
-      <h1 class="title">A workshop guide for <em>algorithms of motion.</em></h1>
-      <p class="subtitle">Curated for members of the IEEE RAS Technical Committee on Algorithms for Planning and Control of Robot Motion.</p>
+      <h1 class="title"><em>ICRA 2026</em></h1>
+      <p class="subtitle">For members of the IEEE RAS Technical Committee on Algorithms for Planning and Control of Robot Motion.</p>
     </div>
     <div class="logo-wrap">
       <img src="logo.png" alt="ICRA 2026 Vienna">
@@ -877,6 +877,8 @@ function csvRow(line) {
   return out;
 }
 
+const clean = v => (!v || /^n\/a$/i.test(v.trim())) ? '' : v;
+
 function toSession(row) {
   // Schema A: separate start_time / end_time columns (workshop CSVs)
   // Schema B: combined time column e.g. "09:00-10:30" (event CSVs)
@@ -897,14 +899,14 @@ function toSession(row) {
     session_code:  row.session_id   || row.session_code || '',
     session_type:  row.event_type   || row.session_type || '',
     workshop_name: row.workshop_short_name || '',
-    location:      row.location     || '',
-    title:         row.talk_title   || row.title || '',
+    location:      clean(row.location)     || '',
+    title:         clean(row.talk_title)   || clean(row.title) || '',
     relevance:     row.priority     || 'noteworthy',
-    why:           row.tc_relevance_reason || row.notes || '',
-    url:           row.url          || '',
-    speaker:         row.speakers     || row.speaker || '',
-    affiliation:     row.speaker_affiliation || row.affiliation || '',
-    workshop_about:  row.workshop_tc_importance || '',
+    why:           clean(row.tc_relevance_reason) || clean(row.notes) || '',
+    url:           clean(row.url)          || '',
+    speaker:       clean(row.speakers)     || clean(row.speaker) || '',
+    affiliation:   clean(row.speaker_affiliation) || clean(row.affiliation) || '',
+    workshop_about: clean(row.workshop_tc_importance) || '',
   };
 }
 
